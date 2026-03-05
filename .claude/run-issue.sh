@@ -15,15 +15,30 @@ echo "================================================"
 echo "  Claude Code — $ISSUE_ID"
 echo "================================================"
 
-# Fetch issue details from Linear API directly
+# Fetch issue details + team info from Linear API directly
 echo "Fetching $ISSUE_ID from Linear..."
 ISSUE_JSON=$(curl -s -X POST https://api.linear.app/graphql \
   -H "Authorization: $LINEAR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"query\": \"{ issue(id: \\\"$ISSUE_ID\\\") { id identifier title description state { name } } }\"}")
+  -d "{\"query\": \"{ issue(id: \\\"$ISSUE_ID\\\") { id identifier title description team { id states { nodes { id name type } } } } }\"}")
 
 ISSUE_TITLE=$(echo "$ISSUE_JSON" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data']['issue']['title'])" 2>/dev/null)
 ISSUE_DESC=$(echo "$ISSUE_JSON"  | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data']['issue']['description'] or '')" 2>/dev/null)
+ISSUE_UUID=$(echo "$ISSUE_JSON"  | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['data']['issue']['id'])" 2>/dev/null)
+DONE_STATE_ID=$(echo "$ISSUE_JSON" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+states=d['data']['issue']['team']['states']['nodes']
+done=[s for s in states if s['type']=='completed']
+print(done[0]['id'] if done else '')
+" 2>/dev/null)
+IN_PROGRESS_STATE_ID=$(echo "$ISSUE_JSON" | python3 -c "
+import sys,json
+d=json.load(sys.stdin)
+states=d['data']['issue']['team']['states']['nodes']
+prog=[s for s in states if s['type']=='started']
+print(prog[0]['id'] if prog else '')
+" 2>/dev/null)
 
 if [ -z "$ISSUE_TITLE" ]; then
   echo "ERROR: Could not fetch issue $ISSUE_ID. Check your LINEAR_API_KEY."
@@ -32,6 +47,17 @@ if [ -z "$ISSUE_TITLE" ]; then
 fi
 
 echo "✓ Got issue: $ISSUE_TITLE"
+
+# Move issue to In Progress via curl (avoids MCP linear_search_issues hanging)
+if [ -n "$IN_PROGRESS_STATE_ID" ] && [ -n "$ISSUE_UUID" ]; then
+  echo "Moving $ISSUE_ID to In Progress..."
+  curl -s -X POST https://api.linear.app/graphql \
+    -H "Authorization: $LINEAR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{\"query\": \"mutation { issueUpdate(id: \\\"$ISSUE_UUID\\\", input: { stateId: \\\"$IN_PROGRESS_STATE_ID\\\" }) { success } }\"}" \
+    | python3 -c "import sys,json; d=json.load(sys.stdin); print('✓ In Progress' if d.get('data',{}).get('issueUpdate',{}).get('success') else '⚠ Could not update state')" 2>/dev/null
+fi
+
 echo ""
 
 # Write prompt to temp file
@@ -42,24 +68,47 @@ You are an autonomous engineer on the clock-hash project.
 Here are the full details for Linear issue $ISSUE_ID:
 
 TITLE: $ISSUE_TITLE
+INTERNAL UUID: $ISSUE_UUID
+DONE STATE ID: $DONE_STATE_ID
 
 $ISSUE_DESC
 
 ---
 
-Follow this exact sequence:
+Your job is to fully implement Linear issue $ISSUE_ID autonomously.
 
-1. Move issue $ISSUE_ID to In Progress via Linear MCP
-2. git checkout dev && git pull origin dev
-3. Create branch: feature/$ISSUE_ID-{kebab-slug derived from title}
-4. Write tests first — confirm RED — then implement until GREEN
-5. Follow ALL coding conventions in CLAUDE.md (SOLID, file size, naming, structure)
-6. npm run lint && (command -v semgrep &>/dev/null && semgrep --config=auto src/ || echo "semgrep not installed, skipping")
-7. Self-CR protocol (CLAUDE.md) — reviewer checks conventions too — max 3 rounds
-8. When APPROVED: bash .claude/merge-gate.sh, commit, push, open PR with gh, merge --squash --delete-branch, move $ISSUE_ID to Done via Linear MCP
-9. After merge: capture the PR URL and run: bash .claude/changelog.sh "$ISSUE_ID" "<issue title>" "<pr url>"
+## IMPORTANT — Linear MCP rules
+NEVER call linear_search_issues or linear_get_issues. These hang in non-interactive mode.
+The issue details are already provided above — you do not need to fetch them.
+Issue is already moved to In Progress by the shell script.
+To mark the issue Done at the end, run this exact bash command:
+  curl -s -X POST https://api.linear.app/graphql \
+    -H "Authorization: \$LINEAR_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d '{"query":"mutation{issueUpdate(id:\"$ISSUE_UUID\",input:{stateId:\"$DONE_STATE_ID\"}){success}}"}'
 
-Do not stop until the issue is Done.
+## Step 0 — Classify
+Read the issue title and description above. Output: [TIER: SMALL | MEDIUM | LARGE]
+Use the Tier Classification rules in CLAUDE.md.
+
+## Step 1 — Branch setup
+git checkout dev && git pull origin dev
+Create branch using the naming convention in CLAUDE.md.
+
+## Steps 2–4 — Follow the adaptive workflow in CLAUDE.md exactly
+Based on your tier classification, follow the matching Phase 1 (Research),
+Phase 2 (Planning & Implementation), Phase 3 (Self-CR), and Phase 4 (Merge)
+instructions from CLAUDE.md.
+
+Key rules that apply to ALL tiers:
+- TDD always: write failing tests first, then implement
+- Follow ALL Coding Conventions in CLAUDE.md
+- npm run lint && (command -v semgrep &>/dev/null && semgrep --config=auto src/ || echo "semgrep skipped")
+- Self-CR fix loop: max 3 rounds before escalating to human
+- After merge: capture PR URL and run: bash .claude/changelog.sh "$ISSUE_ID" "$ISSUE_TITLE" "<pr_url>"
+- Then mark issue Done using the curl command above
+
+Do not stop until the issue is Done in Linear.
 PROMPT
 
 claude --mcp-config "$(dirname "$0")/mcp-config.json" \
