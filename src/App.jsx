@@ -1,15 +1,24 @@
 import { useState, useEffect } from 'react'
+import WorldClocksBar from './WorldClocksBar'
+import { getTimeForTimezone } from './timezones'
 
 function App() {
-  const [time, setTime] = useState(getTime())
+  const [activeZone, setActiveZone] = useState(null)
+  const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    const interval = setInterval(() => setTime(getTime()), 1000)
+    const interval = setInterval(() => setTick((t) => t + 1), 1000)
     return () => clearInterval(interval)
   }, [])
 
-  const color = `#${time.replace(/:/g, '')}`
+  void tick
+  const time = getDisplayTime(activeZone)
+  const color = timeToColor(time)
   const lightness = getLightness(color)
+
+  function handleSelectZone(zone) {
+    setActiveZone((prev) => (prev === zone ? null : zone))
+  }
 
   return (
     <div style={{
@@ -17,23 +26,45 @@ function App() {
       color: lightness > 0.5 ? '#000' : '#fff',
       height: '100vh',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: 'column',
       transition: 'background-color 1s, color 1s',
       fontFamily: 'monospace',
-      fontSize: 'clamp(3rem, 10vw, 8rem)',
     }}>
-      {time}
+      <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} />
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: 'clamp(3rem, 10vw, 8rem)',
+      }}>
+        {time}
+      </div>
     </div>
   )
 }
 
-function getTime() {
+function getDisplayTime(zone) {
+  if (zone) {
+    return getTimeForTimezone(zone)
+  }
+  return getLocalTime()
+}
+
+function getLocalTime() {
   const now = new Date()
   const h = String(now.getHours()).padStart(2, '0')
   const m = String(now.getMinutes()).padStart(2, '0')
   const s = String(now.getSeconds()).padStart(2, '0')
   return `${h}:${m}:${s}`
+}
+
+function timeToColor(time) {
+  const hex = time.replace(/:/g, '')
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return `#${hex}`
+  }
+  return '#000000'
 }
 
 function getLightness(hex) {
