@@ -5,7 +5,7 @@
   font-family: monospace;
   position: relative;
   overflow: hidden;
-  transition: background-color 1s, color 1s;
+  transition: color 1s;
 }
 
 .header {
