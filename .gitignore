@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Secrets & local config (never commit)
+.env*
+.claude/mcp-config.json
+.claude/.cr_approved
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
