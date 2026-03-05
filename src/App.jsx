@@ -8,6 +8,8 @@ import { useColorHistory } from './hooks/useColorHistory'
 import { CountdownTimer } from './components/CountdownTimer'
 import { ColorInfoOverlay } from './components/ColorInfoOverlay'
 import { convertTo12Hour } from './utils/timeFormat'
+import { useNextBeautifulColor } from './hooks/useNextBeautifulColor'
+import { NextBeautifulColorLabel } from './components/NextBeautifulColorLabel'
 
 function App() {
   const [activeZone, setActiveZone] = useState(null)
@@ -25,6 +27,7 @@ function App() {
   const color = timeToColor(time)
   const lightness = getLightness(color)
   const colorHistory = useColorHistory(color)
+  const nextBeautiful = useNextBeautifulColor(is24h)
 
   function handleSelectZone(zone) {
     setActiveZone((prev) => (prev === zone ? null : zone))
@@ -56,6 +59,13 @@ function App() {
         <CountdownTimer />
       </div>
       <ColorHistoryStrip history={colorHistory} />
+      {nextBeautiful && (
+        <NextBeautifulColorLabel
+          label={nextBeautiful.label}
+          display={nextBeautiful.display}
+          textColor={lightness > 0.5 ? '#000' : '#fff'}
+        />
+      )}
       <ColorInfoOverlay hex={color} textColor={lightness > 0.5 ? '#000' : '#fff'} />
     </div>
   )
