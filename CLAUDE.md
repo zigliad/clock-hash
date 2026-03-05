@@ -1,298 +1,114 @@
 # Project: clock-hash
-# Stack: React 19, Vite 7, ESLint, Vitest, @testing-library/react
+# Stack: React 19, Vite 7, Tailwind CSS, shadcn/ui, ESLint, Vitest, @testing-library/react
 
-## Workflow Rules
-1. ALWAYS read the Linear issue fully before touching any code
-2. Write tests FIRST — no implementation without failing tests (TDD)
-3. Run lint before every commit: `npm run lint`
-4. Run security scan: `npx semgrep --config=auto src/`
-5. Coverage must stay >= 80%
-6. Max 3 Self-CR rounds before escalating to human
-
-## Branch Naming
-feature/LIN-{issue-id}-{kebab-slug}
-fix/LIN-{issue-id}-{kebab-slug}
-chore/LIN-{issue-id}-{kebab-slug}
-
-## Base Branch
-Always branch off `dev` and merge back to `dev`.
-`git checkout dev && git pull origin dev` before creating a new branch.
-
-## Test Strategy
-- Unit: vitest for pure functions, hooks, utils
-- Integration: @testing-library/react for components
-- Run all: `npm test` before marking work done
-- Coverage: `npm run test:coverage`
-
-## PR Format
-Title: [LIN-{id}] Brief description
-Body:
-## What changed
-## Why
-## Tests added
-Closes LIN-{id}
+## Rules
+- TDD always: write failing tests first, implement until green
+- Coverage >= 80% (`npm run test:coverage`)
+- Lint before every commit: `npm run lint`
+- Security: `npx semgrep --config=auto src/` (skip if not installed)
+- Max 3 Self-CR rounds before escalating to human
+- Branch off `dev`, merge back to `dev`
+- Branch naming: `feature|fix|chore/LIN-{id}-{kebab-slug}`
+- PR title: `[LIN-{id}] Brief description` — body: What/Why/Tests/Closes
 
 ---
 
-## Adaptive Workflow
+## Step 0 — Classify
+Output `[TIER: SMALL | MEDIUM | LARGE]` before doing anything else.
 
-Before doing anything else, classify the issue into a tier:
-
-### Tier Classification
-
-**SMALL** — bug fix, copy change, style tweak, single prop addition
-- Signals: touches ≤ 2 files, no new hooks/utils needed, no new component
-
-**MEDIUM** — new component, new hook, small feature end-to-end
-- Signals: touches 3–6 files, at most one new hook or util module
-
-**LARGE** — multi-component feature, new subsystem, cross-cutting concern
-- Signals: touches 7+ files, needs multiple new hooks/components/utils, or
-  involves data flow changes across the app
-
-Output your classification as: `[TIER: SMALL | MEDIUM | LARGE]` before proceeding.
+| Tier | Signal |
+|------|--------|
+| **SMALL** | ≤ 2 files, no new hooks/components |
+| **MEDIUM** | 3–6 files, ≤ 1 new hook or util |
+| **LARGE** | 7+ files, multiple new hooks/components, or cross-cutting data flow |
 
 ---
 
 ## Phase 1 — Research
 
-### SMALL
-Read only the files directly relevant to the issue. No parallel agents needed.
+**SMALL** — Read only relevant files directly.
 
-### MEDIUM
-Spawn 2 agents IN PARALLEL:
+**MEDIUM** — Spawn 2 agents IN PARALLEL:
+- Agent 1: Read `src/components/` + `src/hooks/`. Summarise patterns + existing hooks. Output JSON.
+- Agent 2: Read all `*.test.*` files. Summarise what's tested and gaps. Output JSON.
 
-**Agent 1 — Codebase Scan**
-"Read src/components/ and src/hooks/. Summarise existing patterns,
-naming conventions, and what hooks already exist. Output JSON."
+**LARGE** — Spawn 3 agents IN PARALLEL:
+- Agent 1: Read `src/components/`. Output `{ components, patterns, sharedPrimitives }`.
+- Agent 2: Read `src/hooks/` + `src/utils/`. Output `{ hooks, utils, constants }`.
+- Agent 3: Read all `*.test.*` files. Output `{ covered, gaps, testPatterns }`.
 
-**Agent 2 — Test Coverage Map**
-"Read all *.test.* files in src/. Summarise what is tested and what gaps exist. Output JSON."
-
-### LARGE
-Spawn 3 agents IN PARALLEL:
-
-**Agent 1 — Component Patterns**
-"Read all files in src/components/. Summarise: existing component structure,
-naming conventions, prop patterns, and any shared primitives. Output as JSON:
-{ components: [...], patterns: [...], sharedPrimitives: [...] }"
-
-**Agent 2 — Hooks & Utils Inventory**
-"Read all files in src/hooks/ and src/utils/. Summarise: existing hooks,
-utility functions, constants, and what each does. Output as JSON:
-{ hooks: [...], utils: [...], constants: [...] }"
-
-**Agent 3 — Test Coverage Map**
-"Read all *.test.* files in src/. Summarise: what is already tested,
-what is NOT tested, and any patterns in test structure. Output as JSON:
-{ covered: [...], gaps: [...], testPatterns: [...] }"
-
-Wait for all agents to complete before continuing.
+Wait for all agents before continuing.
 
 ---
 
-## Phase 2 — Planning & Implementation
+## Phase 2 — Implementation
 
-### SMALL
-1. Move issue to In Progress
-2. Branch off dev
-3. Write failing test(s) → implement → green
-4. Lint + semgrep
+**SMALL** — Branch → write failing tests → implement → green → lint.
 
-### MEDIUM
-1. Move issue to In Progress
-2. Branch off dev
-3. Spawn **Architect Agent**:
-   "Given the issue and codebase research, produce a concise implementation plan:
-   which files to create/modify, what each does, how they connect.
-   Output JSON: { filesToCreate: [...], filesToModify: [...], dataFlow: '...' }"
-4. Follow the plan: write failing tests → implement → green
-5. Lint + semgrep
+**MEDIUM** — Branch → Architect Agent (output JSON plan: `filesToCreate, filesToModify, dataFlow`) → follow plan → TDD → lint.
 
-### LARGE
-Spawn agents sequentially — each feeds the next:
-
-**Step 1 — Architect Agent**
-"Design the full solution: component tree, hook responsibilities, util contracts,
-data flow, and file structure. Be precise. Output JSON plan."
-
-**Step 2 — Test Author Agent** (receives architect's plan)
-"Write ALL tests for the plan above. Do not implement — tests must be RED.
-Cover: happy path, edge cases, error states, accessibility where relevant."
-
-**Step 3 — Parallel Implementer Agents** (receive plan + failing tests)
-Spawn one agent per logical slice, IN PARALLEL:
-- Agent A: implement hooks + utils
-- Agent B: implement components (pure UI, no logic)
-
-Wait for both to complete, then:
-
-**Step 4 — Integrator Agent** (receives all outputs)
-"Wire everything together: update App/router/index exports as needed.
-Ensure all tests are now GREEN. Do not change logic — only integrate."
-
-**Step 5 — UI Polish Agent** (receives integrated code)
-"Review only styles and layout. Fix spacing, responsiveness, visual consistency
-with the existing design. No logic changes."
+**LARGE** — Run agents sequentially, each feeds the next:
+1. **Architect** — full solution design, JSON plan
+2. **Test Author** (gets plan) — write ALL tests, RED only, no implementation
+3. **Parallel implementers** (get plan + tests): Agent A: hooks + utils | Agent B: components
+4. **Integrator** (gets all outputs) — wire together, ensure GREEN, no logic changes
+5. **UI Polish** (gets integrated code) — styles/layout/responsiveness only, no logic
 
 ---
 
 ## Phase 3 — Self-CR
 
-### SMALL
-Spawn 1 reviewer with the full diff:
+All reviewers receive the full `git diff` vs `dev`. Output format for all:
+`{ verdict: APPROVED | CHANGES_REQUESTED, findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }`
 
-**Reviewer — Bug & Conventions**
-"You did NOT write this code. Hunt for: bugs, edge cases, SOLID violations,
-naming issues, missing tests. Output ONLY valid JSON:
-{ verdict: APPROVED | CHANGES_REQUESTED,
-  findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
+**SMALL** — 1 reviewer: bugs, edge cases, SOLID violations, naming, missing tests.
 
-### MEDIUM
-Before spawning reviewers, run the visual check:
-  bash .claude/visual-check.sh
-Include the screenshot output in the review context.
+**MEDIUM** — Run `bash .claude/visual-check.sh` first, then 3 reviewers IN PARALLEL:
+- **Reviewer A** — bugs, security, null crashes, race conditions
+- **Reviewer B** — SOLID violations, files >200 lines, components >80 lines, prop drilling, magic strings
+- **Reviewer C** — overlapping components, missing flex/grid, bad `position:absolute`, z-index conflicts, overflow issues, unresponsive layouts
 
-Spawn 3 reviewers IN PARALLEL with the full diff:
+**LARGE** — 3 reviewers IN PARALLEL (A + B same as MEDIUM):
+- **Reviewer C** — aria labels, keyboard traps, colour contrast, loading/error states, unresponsive layouts
 
-**Reviewer A — Bug & Security**
-"You did NOT write this code. Hunt for: bugs, security issues, null crashes,
-edge cases, race conditions. Be adversarial. Output ONLY valid JSON:
-{ verdict: APPROVED | CHANGES_REQUESTED,
-  findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
+Overall = APPROVED only if ALL reviewers approve.
 
-**Reviewer B — Architecture & Conventions**
-"You did NOT write this code. Hunt for: SOLID violations, components over 80 lines,
-files over 200 lines, prop drilling, logic in components, magic strings, test gaps.
-Output ONLY valid JSON:
-{ verdict: APPROVED | CHANGES_REQUESTED,
-  findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
-
-**Reviewer C — Layout & UX**
-"You did NOT write this code. Hunt for: components overlapping or stacking
-incorrectly, missing flex/grid containers, absolute positioning without
-proper parent context, z-index conflicts, elements hidden behind others,
-missing overflow handling, unresponsive layouts, inconsistent spacing.
-Output ONLY valid JSON:
-{ verdict: APPROVED | CHANGES_REQUESTED,
-  findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
-
-Overall = APPROVED only if ALL THREE approve.
-
-### LARGE
-Spawn 3 reviewers IN PARALLEL with the full diff:
-
-**Reviewer A — Bug & Security** (same as MEDIUM)
-
-**Reviewer B — Architecture & Conventions** (same as MEDIUM)
-
-**Reviewer C — UX & Accessibility**
-"You did NOT write this code. Hunt for: missing aria labels, keyboard traps,
-colour contrast issues, poor loading/error states, janky animations,
-unresponsive layouts. Output ONLY valid JSON:
-{ verdict: APPROVED | CHANGES_REQUESTED,
-  findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
-
-Overall = APPROVED only if ALL THREE approve.
-
-### Fix Loop (all tiers)
-IF any reviewer returns CHANGES_REQUESTED:
-  - Fix all findings (HIGH first, then MED, then LOW)
-  - Re-run full test suite + lint + semgrep
-  - Spawn reviewer(s) again with new diff
-  - Repeat up to MAX 3 ROUNDS
-  - Do NOT comment on Linear during this loop
-
-IF still failing after round 3:
-  - Comment on Linear: 'Self-CR blocked after 3 rounds. Human review needed.'
-  - STOP. Do not merge.
+**Fix loop:** Fix findings (HIGH → MED → LOW), re-run tests + lint, respawn reviewers. Max 3 rounds.
+If still failing after round 3 → comment on Linear: "Self-CR blocked after 3 rounds. Human review needed." → STOP.
 
 ---
 
-## Phase 4 — Merge (all tiers)
-1. Write .claude/.cr_approved marker file
-2. Run merge gate: bash .claude/merge-gate.sh
-3. gh pr merge {PR} --squash --delete-branch
-4. git checkout dev && git pull origin dev
-5. Move Linear issue to: Done
-6. bash .claude/changelog.sh "{id}" "{title}" "{pr_url}"
-
----
-
-## Definition of Done
-- Tests: all passing
-- Lint: zero errors
-- Security: no HIGH or CRITICAL findings
-- Self-CR: APPROVED verdict received (1 reviewer for SMALL, 2 for MEDIUM, 3 for LARGE)
-- PR: opened and linked to Linear issue
-- Merge: squash-merged to dev
-- Linear: issue moved to Done
+## Phase 4 — Merge
+1. Write `.claude/.cr_approved`
+2. `bash .claude/merge-gate.sh`
+3. `gh pr merge {PR} --squash --delete-branch`
+4. `git checkout dev && git pull origin dev`
+5. Mark Linear issue Done
+6. `bash .claude/changelog.sh "{id}" "{title}" "{pr_url}"`
 
 ---
 
 ## Coding Conventions
 
-These rules are enforced during Self-CR. Violations are treated as MED findings.
+**Files** — Max 200 lines. One concept per file (one component, one hook, one util).
 
-### File Size
-- Max 200 lines per file. If a file exceeds this, split it.
-- One concept per file: one component, one hook, one util module.
+**SOLID** — Single responsibility (no "and"); extend via props not modification; no prop drilling >2 levels; inject dependencies, don't hardcode.
 
-### SOLID Principles
-- **Single Responsibility**: every function, hook, and component does exactly one thing.
-  If you need "and" to describe what it does, split it.
-- **Open/Closed**: extend behaviour via props/composition, not by modifying existing components.
-- **Liskov Substitution**: components/functions should be replaceable with variants
-  without breaking callers.
-- **Interface Segregation**: don't pass props a component doesn't use. Compose small
-  focused interfaces rather than one large object.
-- **Dependency Inversion**: depend on abstractions (props, callbacks, context) not
-  concrete implementations. Inject dependencies; don't hardcode them.
+**React** — Hooks think, components render. Max ~80 lines per component. Pure/stateless preferred. Co-locate tests: `MyComponent.test.jsx` beside `MyComponent.jsx`.
 
-### React-Specific
-- Extract all non-trivial logic into custom hooks (`use` prefix). Components render, hooks think.
-- No component longer than ~80 lines. If it is, extract sub-components or hooks.
-- No prop drilling beyond 2 levels. Use context or composition instead.
-- Prefer pure, stateless components. Lift state only as high as needed.
-- Co-locate tests with source: `MyComponent.test.jsx` next to `MyComponent.jsx`.
+**Functions** — Pure where possible. Max 3 params (group into object if more). Named constants, no magic values. Early returns over nesting.
 
-### Functions & Logic
-- Pure functions wherever possible — no hidden side effects.
-- Max 3 parameters per function. Group related params into an object.
-- No magic numbers or strings — use named constants.
-- Early returns over nested conditionals.
-- Avoid comments that explain "what" — write self-documenting code.
-  Comments should only explain "why" when the reason is non-obvious.
+**Naming** — Components: `PascalCase` | Hooks: `useHookName` | Utils: `camelCase` | Tests: `{name}.test.jsx`
 
-### Naming
-- Components: PascalCase (`WorldClockCard`)
-- Hooks: camelCase with `use` prefix (`useWorldClock`)
-- Utils/constants: camelCase (`formatTime`, `DEFAULT_TIMEZONES`)
-- Test files: `{name}.test.jsx` or `{name}.test.js`
+**Structure** — `src/components/` (UI only) | `src/hooks/` (logic) | `src/utils/` (pure functions) | `src/test/` (global setup)
 
-### Structure
-```
-src/
-  components/    # Pure UI components, no business logic
-  hooks/         # Custom React hooks
-  utils/         # Pure functions, helpers, constants
-  test/          # Global test setup only
-```
+**UI & Styling** — Use shadcn/ui components first before building custom ones. Compose with Tailwind utility classes only — no CSS modules, no inline styles. Import shadcn components from `@/components/ui/`.
 
-### Layout & CSS Rules
-These are enforced by Reviewer C. Violations are HIGH findings.
-
-- **Never use `position: absolute` or `position: fixed`** to place a component
-  inside a normal document flow. Only use it for overlays, tooltips, and
-  intentional popups — and always set `position: relative` on the parent.
-- **Always use flexbox or grid** for multi-element layouts. Never rely on
-  default block stacking unless it's intentional (e.g. stacked paragraphs).
-- **No magic z-index values** — use named constants (`Z_OVERLAY = 100`,
-  `Z_MODAL = 200`) and keep them in `src/utils/zIndex.js`.
-- **Every new component must have a defined width** — never assume it will
-  inherit the right width from its parent.
-- **Use `overflow: hidden` defensively** on containers whose children might
-  escape their bounds.
-- **Check at two breakpoints** after implementing any UI: mobile (375px)
-  and desktop (1280px). If it breaks at either, fix it before Self-CR.
-- **No inline styles for layout** — use CSS modules or Tailwind classes only.
+**Layout** (violations = HIGH in Self-CR):
+- No `position:absolute/fixed` in normal flow — overlays only, always with `position:relative` parent
+- Always flexbox/grid for multi-element layouts (`flex`, `grid` Tailwind classes)
+- No magic z-index — use named constants in `src/utils/zIndex.js`
+- Every component must define its own width
+- `overflow:hidden` on containers whose children might escape
+- Must pass at 375px (mobile) and 1280px (desktop) before Self-CR
+- No inline styles for layout — Tailwind classes only (no CSS modules)

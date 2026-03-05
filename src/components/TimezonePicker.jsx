@@ -1,6 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { getCityName } from '../timezones'
-import styles from './TimezonePicker.module.css'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 let ALL_TIMEZONES = []
 try {
@@ -35,36 +36,38 @@ export function TimezonePicker({ onSelect, onClose }) {
   }, [query])
 
   return (
-    <div className={styles.picker}>
-      <div className={styles.header}>
-        <input
+    <div className="flex flex-col w-[280px] max-h-[320px] bg-black/85 rounded-lg overflow-hidden">
+      <div className="flex gap-1 p-2">
+        <Input
           ref={inputRef}
-          className={styles.search}
           type="text"
           placeholder="Search timezone..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/50"
         />
-        <button
-          className={styles.closeBtn}
+        <Button
           aria-label="Close picker"
           onClick={onClose}
+          variant="ghost"
+          size="icon"
+          className="text-white text-lg min-w-7"
         >
           &times;
-        </button>
+        </Button>
       </div>
-      <ul className={styles.list}>
+      <ul className="list-none m-0 p-0 overflow-y-auto flex-1">
         {filtered.length === 0 && (
-          <li className={styles.noResults}>No timezones found</li>
+          <li className="p-3 text-center text-white/50 text-[13px]">No timezones found</li>
         )}
         {filtered.map((tz) => (
           <li key={tz}>
             <button
-              className={styles.option}
+              className="flex justify-between items-center w-full py-2 px-3 bg-transparent border-none text-white cursor-pointer text-left text-[13px] gap-2 hover:bg-white/15"
               onClick={() => onSelect(tz)}
             >
-              <span className={styles.city}>{getCityName(tz)}</span>
-              <span className={styles.region}>{tz}</span>
+              <span className="font-bold">{getCityName(tz)}</span>
+              <span className="text-[11px] opacity-60">{tz}</span>
             </button>
           </li>
         ))}

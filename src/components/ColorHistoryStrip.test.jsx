@@ -16,7 +16,7 @@ describe('ColorHistoryStrip', () => {
     expect(strip).toBeInTheDocument()
   })
 
-  it('has the strip CSS module class applied', () => {
+  it('has Tailwind classes applied', () => {
     render(<ColorHistoryStrip history={[]} />)
     const strip = screen.getByTestId('color-history-strip')
     expect(strip.className).toBeTruthy()
@@ -59,7 +59,7 @@ describe('ColorHistoryStrip', () => {
     expect(slice.getAttribute('title')).toBe('12:00:05 — #abcdef')
   })
 
-  it('uses CSS module class for layout', () => {
+  it('uses Tailwind classes for layout', () => {
     render(<ColorHistoryStrip history={[]} />)
     const strip = screen.getByTestId('color-history-strip')
     expect(strip.className).toBeTruthy()

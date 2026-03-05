@@ -1,15 +1,17 @@
-import styles from './TimeFormatToggle.module.css'
+import { Button } from '@/components/ui/button'
 
 function TimeFormatToggle({ is24h, onToggle }) {
   return (
-    <button
+    <Button
       type="button"
       aria-label="time format toggle"
       onClick={onToggle}
-      className={styles.button}
+      variant="outline"
+      size="sm"
+      className="font-mono"
     >
       {is24h ? '24h' : '12h'}
-    </button>
+    </Button>
   )
 }
 

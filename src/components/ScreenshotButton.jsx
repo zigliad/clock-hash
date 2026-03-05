@@ -1,14 +1,16 @@
-import styles from './ScreenshotButton.module.css'
+import { Button } from '@/components/ui/button'
 
 export function ScreenshotButton({ onCapture }) {
   return (
-    <button
+    <Button
       data-testid="screenshot-button"
       aria-label="Take screenshot"
       onClick={onCapture}
-      className={styles.button}
+      variant="ghost"
+      size="icon"
+      className="opacity-50"
     >
       &#128247;
-    </button>
+    </Button>
   )
 }

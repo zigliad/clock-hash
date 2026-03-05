@@ -50,7 +50,7 @@ describe('FavoritesPanel', () => {
     render(<FavoritesPanel favorites={mockFavorites} activeFavoriteId="1" onSelect={() => {}} onDelete={() => {}} />)
     fireEvent.click(screen.getByTestId('favorites-toggle'))
     const swatch = screen.getByTestId('swatch-1')
-    expect(swatch.className).toMatch(/active/)
+    expect(swatch.getAttribute('data-active')).toBe('true')
   })
 
   it('calls onSelect when a swatch is clicked', () => {

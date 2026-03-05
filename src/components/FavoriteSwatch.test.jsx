@@ -38,7 +38,7 @@ describe('FavoriteSwatch', () => {
   it('shows active indicator when selected', () => {
     render(<FavoriteSwatch favorite={mockFav} isActive={true} onSelect={() => {}} onDelete={() => {}} />)
     const swatch = screen.getByTestId('swatch-1')
-    expect(swatch.className).toMatch(/active/)
+    expect(swatch.getAttribute('data-active')).toBe('true')
   })
 
   it('is keyboard accessible with Enter key', () => {
