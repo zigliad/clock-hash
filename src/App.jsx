@@ -13,6 +13,8 @@ import { useNextBeautifulColor } from './hooks/useNextBeautifulColor'
 import { NextBeautifulColorLabel } from './components/NextBeautifulColorLabel'
 import { useFullscreen } from './hooks/useFullscreen'
 import { FullscreenButton } from './components/FullscreenButton'
+import { useScreenshot } from './hooks/useScreenshot'
+import { ScreenshotButton } from './components/ScreenshotButton'
 import styles from './App.module.css'
 
 function App() {
@@ -33,7 +35,12 @@ function App() {
   const colorHistory = useColorHistory(color)
   const nextBeautiful = useNextBeautifulColor(is24h)
   const { isFullscreen, cursorHidden, toggleFullscreen } = useFullscreen()
+  const { takeScreenshot } = useScreenshot()
   const textColor = lightness > 0.5 ? '#000' : '#fff'
+
+  function handleScreenshot() {
+    takeScreenshot({ time: rawTime, hex: color, textColor })
+  }
 
   function handleSelectZone(zone) {
     setActiveZone((prev) => (prev === zone ? null : zone))
@@ -54,6 +61,7 @@ function App() {
             <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} is24h={is24h} />
           </div>
           <div className={styles.toolbar}>
+            <ScreenshotButton onCapture={handleScreenshot} />
             <TimeFormatToggle is24h={is24h} onToggle={toggle} />
             {!cursorHidden && <FullscreenButton isFullscreen={isFullscreen} onToggle={toggleFullscreen} />}
           </div>
