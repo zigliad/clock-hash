@@ -15,7 +15,7 @@ describe('ColorInfoOverlay', () => {
 
   it('renders nearest CSS color name', () => {
     render(<ColorInfoOverlay hex="#143a52" textColor="#fff" />)
-    expect(screen.getByText(/darkslategray/)).toBeInTheDocument()
+    expect(screen.getByText(/port blue/)).toBeInTheDocument()
   })
 
   it('adapts text color based on textColor prop', () => {

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { findNearestCssColor, CSS_COLORS } from './cssColors'
 
 describe('CSS_COLORS', () => {
-  it('contains exactly 140 named colors', () => {
-    expect(CSS_COLORS).toHaveLength(140)
+  it('contains exactly 1000 named colors', () => {
+    expect(CSS_COLORS).toHaveLength(1000)
   })
 
   it('each entry has name, r, g, b properties', () => {
@@ -30,7 +30,7 @@ describe('findNearestCssColor', () => {
   })
 
   it('returns nearest color for arbitrary RGB', () => {
-    expect(findNearestCssColor(20, 58, 82)).toBe('darkslategray')
+    expect(findNearestCssColor(20, 58, 82)).toBe('port blue')
   })
 
   it('returns exact match for cornflowerblue', () => {

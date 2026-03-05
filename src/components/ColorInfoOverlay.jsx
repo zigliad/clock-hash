@@ -9,7 +9,7 @@ export function ColorInfoOverlay({ hex, textColor }) {
       data-testid="color-info-overlay"
       style={{
         position: 'absolute',
-        bottom: '1rem',
+        bottom: '2.5rem',
         right: '1rem',
         fontSize: '0.75rem',
         fontFamily: 'monospace',

@@ -34,7 +34,7 @@ export function CountdownTimer() {
   if (mode === MODE_INPUT) {
     return (
       <div data-testid="countdown-timer" style={containerStyle}>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} style={formStyle}>
           <input
             aria-label="Target time"
             type="time"
@@ -43,6 +43,9 @@ export function CountdownTimer() {
             onKeyDown={(e) => e.key === 'Escape' && handleCancel()}
             style={inputStyle}
           />
+          <button type="submit" style={setButtonStyle}>
+            Set
+          </button>
         </form>
         <button
           onClick={handleCancel}
@@ -98,6 +101,12 @@ const containerStyle = {
 
 const displayStyle = {
   fontFamily: 'monospace',
+}
+
+const formStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
 }
 
 const inputStyle = {

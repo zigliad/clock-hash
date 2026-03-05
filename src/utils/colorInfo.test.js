@@ -34,7 +34,7 @@ describe('formatColorInfo', () => {
     const result = formatColorInfo('#143a52')
     expect(result.hex).toBe('#143a52')
     expect(result.rgb).toBe('rgb(20, 58, 82)')
-    expect(result.cssName).toBe('darkslategray')
+    expect(result.cssName).toBe('port blue')
   })
 
   it('identifies exact CSS color matches', () => {
