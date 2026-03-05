@@ -1,10 +1,18 @@
-export const TIMEZONES = [
+export const DEFAULT_TIMEZONES = [
   { label: 'UTC', zone: 'UTC' },
   { label: 'New York', zone: 'America/New_York' },
   { label: 'London', zone: 'Europe/London' },
   { label: 'Tokyo', zone: 'Asia/Tokyo' },
   { label: 'Sydney', zone: 'Australia/Sydney' },
 ]
+
+export const TIMEZONES = DEFAULT_TIMEZONES
+
+export function getCityName(ianaZone) {
+  const parts = ianaZone.split('/')
+  const city = parts[parts.length - 1]
+  return city.replace(/_/g, ' ')
+}
 
 const formatterCache = new Map()
 
