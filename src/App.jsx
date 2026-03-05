@@ -19,7 +19,6 @@ import { ScreenshotButton } from './components/ScreenshotButton'
 import { useFavorites } from './hooks/useFavorites'
 import { HeartButton } from './components/HeartButton'
 import { FavoritesPanel } from './components/FavoritesPanel'
-import styles from './App.module.css'
 
 function App() {
   const [activeZone, setActiveZone] = useState(null)
@@ -98,7 +97,7 @@ function App() {
 
   return (
     <div
-      className={styles.root}
+      className="h-screen flex flex-col font-mono relative overflow-hidden transition-colors duration-1000"
       style={{
         backgroundColor: displayColor,
         color: textColor,
@@ -106,11 +105,11 @@ function App() {
       }}
     >
       {!isFullscreen ? (
-        <div className={styles.header}>
-          <div className={styles.headerClocks}>
+        <div className="flex items-start p-4 gap-3">
+          <div className="flex-1 flex gap-3 justify-center flex-wrap overflow-hidden">
             <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} is24h={is24h} />
           </div>
-          <div className={styles.toolbar}>
+          <div className="flex items-center gap-2 shrink-0">
             <HeartButton onSave={handleSaveFavorite} isFull={isFull} />
             <FavoritesPanel
               favorites={favorites}
@@ -125,17 +124,17 @@ function App() {
         </div>
       ) : (
         !cursorHidden && (
-          <div className={styles.toolbar}>
+          <div className="flex items-center gap-2 shrink-0">
             <FullscreenButton isFullscreen={isFullscreen} onToggle={toggleFullscreen} />
           </div>
         )
       )}
-      <div className={styles.center}>
-        <div data-testid="main-clock" className={styles.clock}>
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div data-testid="main-clock" className="text-[clamp(3rem,10vw,8rem)]">
           {time}
         </div>
         {!isFullscreen && <CountdownTimer />}
-        {frozenColor && <div data-testid="frozen-badge" className={styles.frozenBadge}>frozen</div>}
+        {frozenColor && <div data-testid="frozen-badge" className="text-xs opacity-60 px-2.5 py-0.5 border border-current rounded mt-2">frozen</div>}
       </div>
       {!isFullscreen && nextBeautiful && (
         <NextBeautifulColorLabel

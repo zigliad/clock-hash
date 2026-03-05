@@ -1,4 +1,4 @@
-import styles from './FavoriteSwatch.module.css'
+import { cn } from '@/utils/cn'
 
 export function FavoriteSwatch({ favorite, isActive, onSelect, onDelete }) {
   function handleKeyDown(e) {
@@ -11,7 +11,11 @@ export function FavoriteSwatch({ favorite, isActive, onSelect, onDelete }) {
   return (
     <div
       data-testid={`swatch-${favorite.id}`}
-      className={`${styles.swatch} ${isActive ? styles.active : ''}`}
+      data-active={isActive || undefined}
+      className={cn(
+        'flex items-center gap-2 py-1.5 px-2 rounded-md cursor-pointer w-full opacity-80 hover:opacity-100',
+        isActive && 'opacity-100 outline-2 outline-current'
+      )}
       role="button"
       tabIndex={0}
       onClick={() => onSelect(favorite.id)}
@@ -19,14 +23,14 @@ export function FavoriteSwatch({ favorite, isActive, onSelect, onDelete }) {
     >
       <div
         data-testid={`swatch-color-${favorite.id}`}
-        className={styles.color}
+        className="w-6 h-6 rounded shrink-0 border border-white/30"
         style={{ backgroundColor: favorite.hex }}
       />
-      <span className={styles.hex}>{favorite.hex}</span>
-      <span className={styles.time}>{favorite.time}</span>
+      <span className="font-mono text-xs">{favorite.hex}</span>
+      <span className="font-mono text-[0.75rem] opacity-70">{favorite.time}</span>
       <button
         aria-label="Delete favorite"
-        className={styles.deleteBtn}
+        className="ml-auto bg-transparent border-none text-inherit cursor-pointer text-base px-1.5 py-0.5 opacity-50 hover:opacity-100 shrink-0"
         onClick={(e) => {
           e.stopPropagation()
           onDelete(favorite.id)

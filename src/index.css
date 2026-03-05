@@ -1,7 +1,7 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import "tailwindcss";
+
+@theme {
+  --animate-pulse-flash: pulse-flash 0.5s ease-in-out 6;
 }
 
 @keyframes pulse-flash {
@@ -9,6 +9,14 @@
   50% { opacity: 0.4; }
 }
 
-.pulse {
-  animation: pulse-flash 0.5s ease-in-out 6;
+@utility pulse {
+  animation: var(--animate-pulse-flash);
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }

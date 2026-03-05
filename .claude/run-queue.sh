@@ -58,12 +58,12 @@ echo "Starting in 3 seconds... (Ctrl+C to abort)"
 sleep 3
 echo ""
 
-# Process each issue
+# Process each issue — use here-string to avoid subshell (pipe would swallow exit codes + variables)
 PASSED=0
 FAILED=0
 FAILED_IDS=""
 
-echo "$ISSUES" | while IFS='|' read -r ISSUE_ID ISSUE_TITLE PRIORITY; do
+while IFS='|' read -r ISSUE_ID ISSUE_TITLE PRIORITY; do
   echo "================================================"
   echo "  Running [$PRIORITY] $ISSUE_ID — $ISSUE_TITLE"
   echo "  Started: $(date '+%H:%M:%S')"
@@ -83,7 +83,7 @@ echo "$ISSUES" | while IFS='|' read -r ISSUE_ID ISSUE_TITLE PRIORITY; do
     FAILED_IDS="$FAILED_IDS $ISSUE_ID"
   fi
   echo ""
-done
+done <<< "$ISSUES"
 
 echo "================================================"
 echo "  Queue complete — $(date '+%H:%M:%S')"

@@ -46,7 +46,7 @@ describe('WorldClocksBar', () => {
     expect(tokyoCard.className).not.toBe(utcCard.className)
   })
 
-  it('renders cards container with CSS module class', () => {
+  it('renders cards container with Tailwind classes', () => {
     const { container } = render(
       <WorldClocksBar activeZone={null} onSelectZone={() => {}} />
     )
@@ -54,7 +54,7 @@ describe('WorldClocksBar', () => {
     expect(bar.className).toBeTruthy()
   })
 
-  it('each card has CSS module class applied', () => {
+  it('each card has Tailwind classes applied', () => {
     render(
       <WorldClocksBar activeZone={null} onSelectZone={() => {}} />
     )

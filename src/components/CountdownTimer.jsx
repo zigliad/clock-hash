@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useCountdown } from '../hooks/useCountdown'
 import { isValidTimeInput } from '../utils/countdown'
-import styles from './CountdownTimer.module.css'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const MODE_IDLE = 'idle'
 const MODE_INPUT = 'input'
 const MODE_COUNTING = 'counting'
+const CONTAINER_CLASSES = 'flex items-center justify-center gap-2 p-2 text-lg'
 
 export function CountdownTimer() {
   const [mode, setMode] = useState(MODE_IDLE)
@@ -34,27 +36,29 @@ export function CountdownTimer() {
 
   if (mode === MODE_INPUT) {
     return (
-      <div data-testid="countdown-timer" className={styles.container}>
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <input
+      <div data-testid="countdown-timer" className={CONTAINER_CLASSES}>
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Input
             aria-label="Target time"
             type="time"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Escape' && handleCancel()}
-            className={styles.input}
+            className="font-mono text-base py-1 px-2 bg-white/20 border-current"
           />
-          <button type="submit" className={styles.setButton}>
+          <Button type="submit" variant="outline" size="sm" className="font-mono">
             Set
-          </button>
+          </Button>
         </form>
-        <button
+        <Button
           onClick={handleCancel}
           aria-label="Cancel"
-          className={styles.clearButton}
+          variant="ghost"
+          size="icon"
+          className="text-xl"
         >
           &times;
-        </button>
+        </Button>
       </div>
     )
   }
@@ -63,29 +67,33 @@ export function CountdownTimer() {
     return (
       <div
         data-testid="countdown-timer"
-        className={`${reached ? 'pulse' : ''} ${styles.container}`}
+        className={`${reached ? 'pulse' : ''} ${CONTAINER_CLASSES}`}
       >
-        <span className={styles.display}>{display}</span>
-        <button
+        <span className="font-mono">{display}</span>
+        <Button
           onClick={handleClear}
           aria-label="Clear target"
-          className={styles.clearButton}
+          variant="ghost"
+          size="icon"
+          className="text-xl"
         >
           &times;
-        </button>
+        </Button>
       </div>
     )
   }
 
   return (
-    <div data-testid="countdown-timer" className={styles.container}>
-      <button
+    <div data-testid="countdown-timer" className={CONTAINER_CLASSES}>
+      <Button
         onClick={() => setMode(MODE_INPUT)}
         aria-label="Set target"
-        className={styles.setButton}
+        variant="outline"
+        size="sm"
+        className="font-mono"
       >
         Set target
-      </button>
+      </Button>
     </div>
   )
 }

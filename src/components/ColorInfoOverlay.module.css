@@ -1,8 +1,0 @@
-.overlay {
-  position: absolute;
-  bottom: 2.5rem;
-  right: 1rem;
-  font-size: 0.75rem;
-  font-family: monospace;
-  pointer-events: none;
-}

@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { formatColorInfo } from '../utils/colorInfo'
-import styles from './ColorInfoOverlay.module.css'
 
 export function ColorInfoOverlay({ hex, textColor }) {
   const info = useMemo(() => formatColorInfo(hex), [hex])
@@ -8,8 +7,8 @@ export function ColorInfoOverlay({ hex, textColor }) {
   return (
     <div
       data-testid="color-info-overlay"
-      className={styles.overlay}
-      style={{ color: textColor, opacity: 0.7 }}
+      className="absolute bottom-10 right-4 text-xs font-mono pointer-events-none opacity-70"
+      style={{ color: textColor }}
     >
       {info.hex} &middot; {info.rgb} &middot; {info.cssName}
     </div>

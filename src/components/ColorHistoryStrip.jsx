@@ -1,17 +1,15 @@
-import styles from './ColorHistoryStrip.module.css'
-
 function ColorHistoryStrip({ history = [] }) {
   return (
     <div
       data-testid="color-history-strip"
-      className={styles.strip}
+      className="w-full h-5 flex shrink-0"
     >
       {history.map((entry) => (
         <div
           key={entry.id}
           data-testid="color-slice"
           title={`${entry.time} — ${entry.hex}`}
-          className={styles.slice}
+          className="flex-1"
           style={{ backgroundColor: entry.hex }}
         />
       ))}

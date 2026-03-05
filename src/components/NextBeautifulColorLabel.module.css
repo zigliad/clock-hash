@@ -1,9 +1,0 @@
-.label {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: monospace;
-  font-size: 0.85rem;
-  white-space: nowrap;
-}
