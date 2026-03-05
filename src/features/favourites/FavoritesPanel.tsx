@@ -3,20 +3,34 @@ import { FavoriteSwatch } from './FavoriteSwatch'
 import { Button } from '@/components/ui/button'
 import { Z_OVERLAY } from '@/utils/zIndex'
 
-export function FavoritesPanel({ favorites, activeFavoriteId, onSelect, onDelete }) {
+interface Favorite {
+  id: string
+  hex: string
+  time: string
+  timezone?: string
+}
+
+interface FavoritesPanelProps {
+  favorites: Favorite[]
+  activeFavoriteId: string | null
+  onSelect: (id: string) => void
+  onDelete: (id: string) => void
+}
+
+export function FavoritesPanel({ favorites, activeFavoriteId, onSelect, onDelete }: FavoritesPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const containerRef = useRef(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!isOpen) return
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         e.stopPropagation()
         setIsOpen(false)
       }
     }
-    function handleClickOutside(e) {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false)
       }
     }

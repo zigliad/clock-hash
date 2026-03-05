@@ -1,6 +1,11 @@
 import { Button } from '@/components/ui/button'
 
-export function HeartButton({ onSave, isFull }) {
+interface HeartButtonProps {
+  onSave: () => void
+  isFull: boolean
+}
+
+export function HeartButton({ onSave, isFull }: HeartButtonProps) {
   return (
     <Button
       data-testid="heart-button"

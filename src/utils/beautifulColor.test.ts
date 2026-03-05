@@ -62,7 +62,7 @@ describe('isBeautiful', () => {
   it('returns match for high-saturation color', () => {
     const result = isBeautiful('#0066cc')
     expect(result).not.toBeNull()
-    expect(result.type).toBe('high-saturation')
+    expect(result!.type).toBe('high-saturation')
   })
 
   it('returns null for low-saturation color', () => {
@@ -125,34 +125,34 @@ describe('findNextBeautifulTime', () => {
   it('finds a beautiful time from midnight in 24h', () => {
     const result = findNextBeautifulTime(0, true)
     expect(result).not.toBeNull()
-    expect(result.secondsUntil).toBeGreaterThan(0)
-    expect(result.hex).toMatch(/^#[0-9a-fA-F]{6}$/)
-    expect(typeof result.label).toBe('string')
-    expect(result.label.length).toBeGreaterThan(0)
+    expect(result!.secondsUntil).toBeGreaterThan(0)
+    expect(result!.hex).toMatch(/^#[0-9a-fA-F]{6}$/)
+    expect(typeof result!.label).toBe('string')
+    expect(result!.label.length).toBeGreaterThan(0)
   })
 
   it('does not exceed 12 hour scan window', () => {
     const result = findNextBeautifulTime(0, true)
     expect(result).not.toBeNull()
-    expect(result.secondsUntil).toBeLessThanOrEqual(MAX_SCAN_SECONDS)
+    expect(result!.secondsUntil).toBeLessThanOrEqual(MAX_SCAN_SECONDS)
   })
 
   it('skips the current second (offset starts at 1)', () => {
     const result = findNextBeautifulTime(0, true)
     expect(result).not.toBeNull()
-    expect(result.secondsUntil).toBeGreaterThanOrEqual(1)
+    expect(result!.secondsUntil).toBeGreaterThanOrEqual(1)
   })
 
   it('finds a beautiful time in 12h mode', () => {
     const result = findNextBeautifulTime(0, false)
     expect(result).not.toBeNull()
-    expect(result.secondsUntil).toBeGreaterThan(0)
+    expect(result!.secondsUntil).toBeGreaterThan(0)
   })
 
   it('returns a non-empty label string', () => {
     const result = findNextBeautifulTime(0, true)
     expect(result).not.toBeNull()
-    expect(result.label).toBeTruthy()
-    expect(typeof result.label).toBe('string')
+    expect(result!.label).toBeTruthy()
+    expect(typeof result!.label).toBe('string')
   })
 })

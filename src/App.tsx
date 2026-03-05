@@ -21,10 +21,10 @@ import { HeartButton } from './features/favourites/HeartButton'
 import { FavoritesPanel } from './features/favourites/FavoritesPanel'
 
 function App() {
-  const [activeZone, setActiveZone] = useState(null)
+  const [activeZone, setActiveZone] = useState<string | null>(null)
   const [tick, setTick] = useState(0)
-  const [frozenColor, setFrozenColor] = useState(null)
-  const [activeFavoriteId, setActiveFavoriteId] = useState(null)
+  const [frozenColor, setFrozenColor] = useState<string | null>(null)
+  const [activeFavoriteId, setActiveFavoriteId] = useState<string | null>(null)
   const { is24h, toggle } = useTimeFormat()
   const { favorites, isFull, addFavorite, removeFavorite } = useFavorites()
 
@@ -54,7 +54,7 @@ function App() {
     takeScreenshot({ time: rawTime, hex: color, textColor })
   }
 
-  function handleSelectZone(zone) {
+  function handleSelectZone(zone: string) {
     setActiveZone((prev) => (prev === zone ? null : zone))
   }
 
@@ -62,7 +62,7 @@ function App() {
     addFavorite({ time: rawTime, hex: color, timezone: activeZone || 'local' })
   }
 
-  const handleSelectFavorite = useCallback((id) => {
+  const handleSelectFavorite = useCallback((id: string) => {
     if (activeFavoriteId === id) {
       setFrozenColor(null)
       setActiveFavoriteId(null)
@@ -75,7 +75,7 @@ function App() {
     }
   }, [activeFavoriteId, favorites])
 
-  const handleDeleteFavorite = useCallback((id) => {
+  const handleDeleteFavorite = useCallback((id: string) => {
     if (activeFavoriteId === id) {
       setFrozenColor(null)
       setActiveFavoriteId(null)
@@ -85,7 +85,7 @@ function App() {
 
   useEffect(() => {
     if (!frozenColor) return
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         setFrozenColor(null)
         setActiveFavoriteId(null)

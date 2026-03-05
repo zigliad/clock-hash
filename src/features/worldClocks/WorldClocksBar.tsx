@@ -8,16 +8,22 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
 import { Z_MODAL } from '@/utils/zIndex'
 
-function WorldClocksBar({ activeZone, onSelectZone, is24h = true }) {
-  const { timezones, isCustomized, updateTimezone, resetTimezones } = useCustomTimezones()
-  const [editingIndex, setEditingIndex] = useState(null)
+interface WorldClocksBarProps {
+  activeZone: string | null
+  onSelectZone: (zone: string) => void
+  is24h?: boolean
+}
 
-  function handleEditClick(e, index) {
+function WorldClocksBar({ activeZone, onSelectZone, is24h = true }: WorldClocksBarProps) {
+  const { timezones, isCustomized, updateTimezone, resetTimezones } = useCustomTimezones()
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+
+  function handleEditClick(e: React.MouseEvent, index: number) {
     e.stopPropagation()
     setEditingIndex(index)
   }
 
-  function handleSelect(ianaZone) {
+  function handleSelect(ianaZone: string) {
     if (editingIndex !== null) {
       updateTimezone(editingIndex, ianaZone)
       setEditingIndex(null)

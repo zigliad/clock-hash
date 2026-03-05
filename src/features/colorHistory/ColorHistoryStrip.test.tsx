@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import ColorHistoryStrip from './ColorHistoryStrip'
 
-const makeHistory = (count) =>
+const makeHistory = (count: number) =>
   Array.from({ length: count }, (_, i) => ({
     id: i,
     time: `12:00:${String(i).padStart(2, '0')}`,

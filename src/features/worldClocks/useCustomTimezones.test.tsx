@@ -37,7 +37,7 @@ describe('useCustomTimezones', () => {
     act(() => {
       result.current.updateTimezone(2, 'Asia/Dubai')
     })
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
     expect(stored[2].zone).toBe('Asia/Dubai')
   })
 

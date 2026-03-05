@@ -1,6 +1,10 @@
 import { Button } from '@/components/ui/button'
 
-export function ScreenshotButton({ onCapture }) {
+interface ScreenshotButtonProps {
+  onCapture: () => void
+}
+
+export function ScreenshotButton({ onCapture }: ScreenshotButtonProps) {
   return (
     <Button
       data-testid="screenshot-button"

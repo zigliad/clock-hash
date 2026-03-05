@@ -1,7 +1,11 @@
 import { forwardRef } from 'react'
 import { cn } from '@/utils/cn'
 
-const Input = forwardRef(function Input({ className, ...props }, ref) {
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  className?: string
+}
+
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ className, ...props }, ref) {
   return (
     <input
       ref={ref}

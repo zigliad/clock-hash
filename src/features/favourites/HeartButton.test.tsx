@@ -26,7 +26,7 @@ describe('HeartButton', () => {
     render(<HeartButton onSave={onSave} isFull={true} />)
     fireEvent.click(screen.getByTestId('heart-button'))
     expect(onSave).not.toHaveBeenCalled()
-    expect(screen.getByTestId('heart-button').disabled).toBe(true)
+    expect((screen.getByTestId('heart-button') as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('has data-testid for targeting', () => {

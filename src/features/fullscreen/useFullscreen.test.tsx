@@ -3,14 +3,18 @@ import { renderHook, act } from '@testing-library/react'
 import { useFullscreen } from './useFullscreen'
 
 describe('useFullscreen', () => {
-  let addSpy
-  let removeSpy
+  let addSpy: ReturnType<typeof vi.spyOn>
+  let removeSpy: ReturnType<typeof vi.spyOn>
+
+  function setFullscreenElement(el: Element | null) {
+    Object.defineProperty(document, 'fullscreenElement', { value: el, configurable: true })
+  }
 
   beforeEach(() => {
     vi.useFakeTimers()
     addSpy = vi.spyOn(document, 'addEventListener')
     removeSpy = vi.spyOn(document, 'removeEventListener')
-    document.fullscreenElement = null
+    setFullscreenElement(null)
     document.documentElement.requestFullscreen = vi.fn().mockResolvedValue(undefined)
     document.exitFullscreen = vi.fn().mockResolvedValue(undefined)
   })
@@ -39,7 +43,7 @@ describe('useFullscreen', () => {
   })
 
   it('toggleFullscreen calls exitFullscreen when in fullscreen', () => {
-    document.fullscreenElement = document.documentElement
+    setFullscreenElement(document.documentElement)
     const { result } = renderHook(() => useFullscreen())
 
     act(() => {
@@ -56,14 +60,14 @@ describe('useFullscreen', () => {
     const { result } = renderHook(() => useFullscreen())
 
     act(() => {
-      document.fullscreenElement = document.documentElement
+      setFullscreenElement(document.documentElement)
       document.dispatchEvent(new Event('fullscreenchange'))
     })
 
     expect(result.current.isFullscreen).toBe(true)
 
     act(() => {
-      document.fullscreenElement = null
+      setFullscreenElement(null)
       document.dispatchEvent(new Event('fullscreenchange'))
     })
 
@@ -72,24 +76,24 @@ describe('useFullscreen', () => {
 
   it('pressing F key toggles fullscreen', () => {
     renderHook(() => useFullscreen())
-    const keyHandler = addSpy.mock.calls.find(([e]) => e === 'keydown')?.[1]
+    const keyHandler = addSpy.mock.calls.find(([e]: [string]) => e === 'keydown')?.[1] as ((e: KeyboardEvent) => void) | undefined
     expect(keyHandler).toBeDefined()
 
     act(() => {
-      keyHandler(new KeyboardEvent('keydown', { key: 'f' }))
+      keyHandler!(new KeyboardEvent('keydown', { key: 'f' }))
     })
     expect(document.documentElement.requestFullscreen).toHaveBeenCalled()
   })
 
   it('does not toggle fullscreen when F is pressed in input element', () => {
     renderHook(() => useFullscreen())
-    const keyHandler = addSpy.mock.calls.find(([e]) => e === 'keydown')?.[1]
+    const keyHandler = addSpy.mock.calls.find(([e]: [string]) => e === 'keydown')?.[1] as ((e: KeyboardEvent) => void) | undefined
 
     const input = document.createElement('input')
     const event = new KeyboardEvent('keydown', { key: 'f', bubbles: true })
     Object.defineProperty(event, 'target', { value: input })
     act(() => {
-      keyHandler(event)
+      keyHandler!(event)
     })
     expect(document.documentElement.requestFullscreen).not.toHaveBeenCalled()
   })
@@ -98,7 +102,7 @@ describe('useFullscreen', () => {
     const { result } = renderHook(() => useFullscreen())
 
     act(() => {
-      document.fullscreenElement = document.documentElement
+      setFullscreenElement(document.documentElement)
       document.dispatchEvent(new Event('fullscreenchange'))
     })
 
@@ -113,7 +117,7 @@ describe('useFullscreen', () => {
     const { result } = renderHook(() => useFullscreen())
 
     act(() => {
-      document.fullscreenElement = document.documentElement
+      setFullscreenElement(document.documentElement)
       document.dispatchEvent(new Event('fullscreenchange'))
     })
 
@@ -140,20 +144,20 @@ describe('useFullscreen', () => {
 
   it('does not toggle fullscreen when modifier keys are held', () => {
     renderHook(() => useFullscreen())
-    const keyHandler = addSpy.mock.calls.find(([e]) => e === 'keydown')?.[1]
+    const keyHandler = addSpy.mock.calls.find(([e]: [string]) => e === 'keydown')?.[1] as ((e: KeyboardEvent) => void) | undefined
 
     act(() => {
-      keyHandler(new KeyboardEvent('keydown', { key: 'f', ctrlKey: true }))
+      keyHandler!(new KeyboardEvent('keydown', { key: 'f', ctrlKey: true }))
     })
     expect(document.documentElement.requestFullscreen).not.toHaveBeenCalled()
 
     act(() => {
-      keyHandler(new KeyboardEvent('keydown', { key: 'f', metaKey: true }))
+      keyHandler!(new KeyboardEvent('keydown', { key: 'f', metaKey: true }))
     })
     expect(document.documentElement.requestFullscreen).not.toHaveBeenCalled()
 
     act(() => {
-      keyHandler(new KeyboardEvent('keydown', { key: 'f', altKey: true }))
+      keyHandler!(new KeyboardEvent('keydown', { key: 'f', altKey: true }))
     })
     expect(document.documentElement.requestFullscreen).not.toHaveBeenCalled()
   })

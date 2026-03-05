@@ -32,7 +32,7 @@ describe('useNextBeautifulColor', () => {
     })
 
     expect(result.current).not.toBeNull()
-    expect(result.current.display).not.toBe(initial.display)
+    expect(result.current!.display).not.toBe(initial!.display)
   })
 
   it('re-scans every 60 seconds', () => {

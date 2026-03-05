@@ -41,8 +41,8 @@ describe('WorldClocksBar', () => {
     render(
       <WorldClocksBar activeZone="Asia/Tokyo" onSelectZone={() => {}} />
     )
-    const tokyoCard = screen.getByText('Tokyo').closest('[role="button"]')
-    const utcCard = screen.getByText('UTC').closest('[role="button"]')
+    const tokyoCard = screen.getByText('Tokyo').closest('[role="button"]') as HTMLElement
+    const utcCard = screen.getByText('UTC').closest('[role="button"]') as HTMLElement
     expect(tokyoCard.className).not.toBe(utcCard.className)
   })
 
@@ -50,7 +50,7 @@ describe('WorldClocksBar', () => {
     const { container } = render(
       <WorldClocksBar activeZone={null} onSelectZone={() => {}} />
     )
-    const bar = container.firstChild
+    const bar = container.firstChild as HTMLElement
     expect(bar.className).toBeTruthy()
   })
 
@@ -85,7 +85,7 @@ describe('WorldClocksBar', () => {
 
   it('does not crash when onSelectZone is not provided', () => {
     expect(() => {
-      render(<WorldClocksBar activeZone={null} />)
+      render(<WorldClocksBar activeZone={null} onSelectZone={() => {}} />)
       fireEvent.click(screen.getByText('UTC'))
     }).not.toThrow()
   })

@@ -1,6 +1,11 @@
 import { Button } from '@/components/ui/button'
 
-export function FullscreenButton({ isFullscreen, onToggle }) {
+interface FullscreenButtonProps {
+  isFullscreen: boolean
+  onToggle: () => void
+}
+
+export function FullscreenButton({ isFullscreen, onToggle }: FullscreenButtonProps) {
   return (
     <Button
       data-testid="fullscreen-button"
