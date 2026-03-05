@@ -6,6 +6,7 @@ import { getTimeForTimezone } from './timezones'
 import { useTimeFormat } from './hooks/useTimeFormat'
 import { useColorHistory } from './hooks/useColorHistory'
 import { CountdownTimer } from './components/CountdownTimer'
+import { ColorInfoOverlay } from './components/ColorInfoOverlay'
 import { convertTo12Hour } from './utils/timeFormat'
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
         <CountdownTimer />
       </div>
       <ColorHistoryStrip history={colorHistory} />
+      <ColorInfoOverlay hex={color} textColor={lightness > 0.5 ? '#000' : '#fff'} />
     </div>
   )
 }
