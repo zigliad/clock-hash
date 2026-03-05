@@ -1,4 +1,4 @@
-const BOTTOM_OFFSET = 30
+import styles from './NextBeautifulColorLabel.module.css'
 
 export function NextBeautifulColorLabel({ label, display, textColor }) {
   if (!label || !display) return null
@@ -6,17 +6,8 @@ export function NextBeautifulColorLabel({ label, display, textColor }) {
   return (
     <div
       data-testid="next-beautiful-label"
-      style={{
-        position: 'absolute',
-        bottom: BOTTOM_OFFSET,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        color: textColor,
-        fontFamily: 'monospace',
-        fontSize: '0.85rem',
-        opacity: 0.7,
-        whiteSpace: 'nowrap',
-      }}
+      className={styles.label}
+      style={{ color: textColor, opacity: 0.7 }}
     >
       Next: {label} in {display}
     </div>

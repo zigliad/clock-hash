@@ -1,15 +1,4 @@
-const buttonStyle = {
-  position: 'absolute',
-  top: 10,
-  right: 10,
-  background: 'none',
-  border: 'none',
-  color: 'inherit',
-  cursor: 'pointer',
-  fontSize: '1.5rem',
-  padding: 8,
-  opacity: 0.5,
-}
+import styles from './FullscreenButton.module.css'
 
 export function FullscreenButton({ isFullscreen, onToggle }) {
   return (
@@ -17,7 +6,7 @@ export function FullscreenButton({ isFullscreen, onToggle }) {
       data-testid="fullscreen-button"
       aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
       onClick={onToggle}
-      style={buttonStyle}
+      className={styles.button}
     >
       {isFullscreen ? '\u2716' : '\u26F6'}
     </button>
