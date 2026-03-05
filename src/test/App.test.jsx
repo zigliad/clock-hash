@@ -32,14 +32,14 @@ describe('App', () => {
   it('clicking a timezone card changes the main clock to that timezone', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('Tokyo'))
-    const mainClockDiv = container.querySelector('div[style*="flex: 1"]')
+    const mainClockDiv = container.querySelector('[data-testid="main-clock"]')
     expect(mainClockDiv.textContent).toBe('21:00:00')
   })
 
   it('clicking the active timezone again returns to local time', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('Tokyo'))
-    const mainClockDiv = container.querySelector('div[style*="flex: 1"]')
+    const mainClockDiv = container.querySelector('[data-testid="main-clock"]')
     expect(mainClockDiv.textContent).toBe('21:00:00')
     // Click Tokyo again to deselect
     fireEvent.click(screen.getByText('Tokyo'))
@@ -90,7 +90,7 @@ describe('App', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByRole('button', { name: /time format/i }))
     expect(screen.getByText('12h')).toBeInTheDocument()
-    const mainClockDiv = container.querySelector('div[style*="flex: 1"]')
+    const mainClockDiv = container.querySelector('[data-testid="main-clock"]')
     expect(mainClockDiv.textContent).toMatch(/^(0[1-9]|1[0-2]):\d{2}:\d{2}$/)
   })
 

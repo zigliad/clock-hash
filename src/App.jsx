@@ -5,6 +5,7 @@ import ColorHistoryStrip from './components/ColorHistoryStrip'
 import { getTimeForTimezone } from './timezones'
 import { useTimeFormat } from './hooks/useTimeFormat'
 import { useColorHistory } from './hooks/useColorHistory'
+import { CountdownTimer } from './components/CountdownTimer'
 import { convertTo12Hour } from './utils/timeFormat'
 
 function App() {
@@ -44,11 +45,14 @@ function App() {
       <div style={{
         flex: 1,
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 'clamp(3rem, 10vw, 8rem)',
       }}>
-        {time}
+        <div data-testid="main-clock" style={{ fontSize: 'clamp(3rem, 10vw, 8rem)' }}>
+          {time}
+        </div>
+        <CountdownTimer />
       </div>
       <ColorHistoryStrip history={colorHistory} />
     </div>
