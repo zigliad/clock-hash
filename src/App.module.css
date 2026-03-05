@@ -42,3 +42,12 @@
 .clock {
   font-size: clamp(3rem, 10vw, 8rem);
 }
+
+.frozenBadge {
+  font-size: 0.75rem;
+  opacity: 0.6;
+  padding: 2px 10px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  margin-top: 8px;
+}
