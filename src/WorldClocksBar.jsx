@@ -1,6 +1,7 @@
 import { TIMEZONES, getTimeForTimezone } from './timezones'
+import { convertTo12Hour } from './utils/timeFormat'
 
-function WorldClocksBar({ activeZone, onSelectZone }) {
+function WorldClocksBar({ activeZone, onSelectZone, is24h = true }) {
   return (
     <div style={{
       display: 'flex',
@@ -40,7 +41,9 @@ function WorldClocksBar({ activeZone, onSelectZone }) {
             }}
           >
             <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{tz.label}</div>
-            <div style={{ fontFamily: 'monospace' }}>{getTimeForTimezone(tz.zone)}</div>
+            <div style={{ fontFamily: 'monospace' }}>
+              {is24h ? getTimeForTimezone(tz.zone) : convertTo12Hour(getTimeForTimezone(tz.zone))}
+            </div>
           </div>
         )
       })}
