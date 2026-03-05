@@ -1,5 +1,5 @@
 # Project: clock-hash
-# Stack: React 19, Vite 7, Tailwind CSS, shadcn/ui, ESLint, Vitest, @testing-library/react
+# Stack: React 19, Vite 7, TypeScript, Tailwind CSS, shadcn/ui, ESLint, Vitest, @testing-library/react
 
 ## Rules
 - TDD always: write failing tests first, implement until green
@@ -98,9 +98,22 @@ If still failing after round 3 → comment on Linear: "Self-CR blocked after 3 r
 
 **Functions** — Pure where possible. Max 3 params (group into object if more). Named constants, no magic values. Early returns over nesting.
 
-**Naming** — Components: `PascalCase` | Hooks: `useHookName` | Utils: `camelCase` | Tests: `{name}.test.jsx`
+**TypeScript** — Strict mode always. No `any` without a comment explaining why. All props must have explicit interfaces or type aliases. All hook return types and util function signatures must be explicitly typed. Files: `.ts` / `.tsx`.
 
-**Structure** — `src/components/` (UI only) | `src/hooks/` (logic) | `src/utils/` (pure functions) | `src/test/` (global setup)
+**Naming** — Components: `PascalCase` | Hooks: `useHookName` | Utils: `camelCase` | Types: `PascalCase` | Tests: `{name}.test.tsx`
+
+**Structure**
+```
+src/
+  features/      # One folder per feature — component + hook + types + tests co-located
+  components/    # Shared UI primitives used across 3+ features
+    ui/          # shadcn/ui re-exports
+  hooks/         # Shared hooks used by multiple features
+  utils/         # Pure functions used app-wide
+  types/         # Shared TypeScript types and interfaces
+  test/          # Global test setup only
+```
+No cross-feature imports — shared logic goes to `hooks/` or `utils/`.
 
 **UI & Styling** — Use shadcn/ui components first before building custom ones. Compose with Tailwind utility classes only — no CSS modules, no inline styles. Import shadcn components from `@/components/ui/`.
 

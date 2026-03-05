@@ -1,15 +1,45 @@
 #!/bin/bash
-# Usage: .claude/run-issue.sh IAI-15
+# Usage: .claude/run-issue.sh <ISSUE_ID> [--worktree]
+#   --worktree  Creates an isolated git worktree so multiple issues can run in parallel
 
 ISSUE_ID=$1
+WORKTREE=false
+[[ "$2" == "--worktree" || "$1" == "--worktree" ]] && WORKTREE=true
+[[ "$1" == "--worktree" ]] && ISSUE_ID=$2
 
 if [ -z "$ISSUE_ID" ]; then
-  echo "Usage: .claude/run-issue.sh <ISSUE_ID>  (e.g. IAI-15)"
+  echo "Usage: .claude/run-issue.sh <ISSUE_ID> [--worktree]  (e.g. IAI-15)"
   exit 1
 fi
 
-# Load secrets
-source "$(dirname "$0")/../.env.local"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+# Load secrets from the main repo (env file is not tracked so won't be in worktree)
+source "$REPO_ROOT/.env.local"
+
+# ── Worktree setup ────────────────────────────────────────────────────────────
+if [ "$WORKTREE" = true ]; then
+  WORKTREE_DIR="$REPO_ROOT/../clock-hash-$ISSUE_ID"
+
+  echo "Creating worktree at $WORKTREE_DIR..."
+  git -C "$REPO_ROOT" worktree add "$WORKTREE_DIR" dev 2>&1
+
+  # Copy secrets into worktree (not tracked by git)
+  cp "$REPO_ROOT/.env.local" "$WORKTREE_DIR/.env.local"
+
+  # Re-launch this script from inside the worktree (without --worktree to avoid loop)
+  bash "$WORKTREE_DIR/.claude/run-issue.sh" "$ISSUE_ID"
+  EXIT_CODE=$?
+
+  # Cleanup worktree after completion
+  echo "Cleaning up worktree..."
+  git -C "$REPO_ROOT" worktree remove "$WORKTREE_DIR" --force 2>/dev/null
+  rm -f "$WORKTREE_DIR/.env.local" 2>/dev/null
+
+  exit $EXIT_CODE
+fi
+# ─────────────────────────────────────────────────────────────────────────────
 
 echo "================================================"
 echo "  Claude Code — $ISSUE_ID"
