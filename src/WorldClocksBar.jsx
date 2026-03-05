@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { getTimeForTimezone } from './timezones'
+import { timeToColor } from './utils/clock'
 import { convertTo12Hour } from './utils/timeFormat'
 import { useCustomTimezones } from './hooks/useCustomTimezones'
 import { TimezonePicker } from './components/TimezonePicker'
@@ -30,6 +31,8 @@ function WorldClocksBar({ activeZone, onSelectZone, is24h = true }) {
       {timezones.map((tz, index) => {
         const isActive = activeZone === tz.zone
         const cardClass = `${styles.card} ${isActive ? styles.cardActive : styles.cardInactive}`
+        const tzTime = getTimeForTimezone(tz.zone)
+        const tzColor = timeToColor(tzTime)
         return (
           <div
             key={tz.zone + index}
@@ -50,9 +53,16 @@ function WorldClocksBar({ activeZone, onSelectZone, is24h = true }) {
               }}
               className={cardClass}
             >
+              <span
+                data-testid="tz-swatch"
+                className={styles.swatch}
+                style={{ backgroundColor: tzColor }}
+                title={tzColor}
+                aria-hidden="true"
+              />
               <div className={styles.cardLabel}>{tz.label}</div>
               <div className={styles.cardTime}>
-                {is24h ? getTimeForTimezone(tz.zone) : convertTo12Hour(getTimeForTimezone(tz.zone))}
+                {is24h ? tzTime : convertTo12Hour(tzTime)}
               </div>
               <button
                 className={styles.editBtn}

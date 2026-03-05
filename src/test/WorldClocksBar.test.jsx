@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import WorldClocksBar from '../WorldClocksBar'
-import { DEFAULT_TIMEZONES } from '../timezones'
+import { DEFAULT_TIMEZONES, getTimeForTimezone } from '../timezones'
+import { timeToColor } from '../utils/clock'
 
 describe('WorldClocksBar', () => {
   beforeEach(() => {
@@ -157,5 +158,27 @@ describe('WorldClocksBar', () => {
     render(<WorldClocksBar activeZone={null} onSelectZone={onSelectZone} />)
     fireEvent.click(screen.getByLabelText('Edit UTC timezone'))
     expect(onSelectZone).not.toHaveBeenCalled()
+  })
+
+  describe('color swatch', () => {
+    it('renders a color swatch for each timezone card with correct color and tooltip', () => {
+      render(<WorldClocksBar activeZone={null} onSelectZone={() => {}} />)
+      const swatches = screen.getAllByTestId('tz-swatch')
+      expect(swatches).toHaveLength(DEFAULT_TIMEZONES.length)
+      DEFAULT_TIMEZONES.forEach((tz, i) => {
+        const tzTime = getTimeForTimezone(tz.zone)
+        const tzColor = timeToColor(tzTime)
+        expect(swatches[i].title).toBe(tzColor)
+        expect(swatches[i].style.backgroundColor).toBeTruthy()
+      })
+    })
+
+    it('swatch is decorative (aria-hidden) since parent button provides context', () => {
+      render(<WorldClocksBar activeZone={null} onSelectZone={() => {}} />)
+      const swatches = screen.getAllByTestId('tz-swatch')
+      swatches.forEach((swatch) => {
+        expect(swatch.getAttribute('aria-hidden')).toBe('true')
+      })
+    })
   })
 })
