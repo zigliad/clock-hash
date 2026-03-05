@@ -149,7 +149,11 @@ naming issues, missing tests. Output ONLY valid JSON:
   findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
 
 ### MEDIUM
-Spawn 2 reviewers IN PARALLEL with the full diff:
+Before spawning reviewers, run the visual check:
+  bash .claude/visual-check.sh
+Include the screenshot output in the review context.
+
+Spawn 3 reviewers IN PARALLEL with the full diff:
 
 **Reviewer A — Bug & Security**
 "You did NOT write this code. Hunt for: bugs, security issues, null crashes,
@@ -164,7 +168,16 @@ Output ONLY valid JSON:
 { verdict: APPROVED | CHANGES_REQUESTED,
   findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
 
-Overall = APPROVED only if BOTH approve.
+**Reviewer C — Layout & UX**
+"You did NOT write this code. Hunt for: components overlapping or stacking
+incorrectly, missing flex/grid containers, absolute positioning without
+proper parent context, z-index conflicts, elements hidden behind others,
+missing overflow handling, unresponsive layouts, inconsistent spacing.
+Output ONLY valid JSON:
+{ verdict: APPROVED | CHANGES_REQUESTED,
+  findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
+
+Overall = APPROVED only if ALL THREE approve.
 
 ### LARGE
 Spawn 3 reviewers IN PARALLEL with the full diff:
@@ -265,3 +278,21 @@ src/
   utils/         # Pure functions, helpers, constants
   test/          # Global test setup only
 ```
+
+### Layout & CSS Rules
+These are enforced by Reviewer C. Violations are HIGH findings.
+
+- **Never use `position: absolute` or `position: fixed`** to place a component
+  inside a normal document flow. Only use it for overlays, tooltips, and
+  intentional popups — and always set `position: relative` on the parent.
+- **Always use flexbox or grid** for multi-element layouts. Never rely on
+  default block stacking unless it's intentional (e.g. stacked paragraphs).
+- **No magic z-index values** — use named constants (`Z_OVERLAY = 100`,
+  `Z_MODAL = 200`) and keep them in `src/utils/zIndex.js`.
+- **Every new component must have a defined width** — never assume it will
+  inherit the right width from its parent.
+- **Use `overflow: hidden` defensively** on containers whose children might
+  escape their bounds.
+- **Check at two breakpoints** after implementing any UI: mobile (375px)
+  and desktop (1280px). If it breaks at either, fix it before Self-CR.
+- **No inline styles for layout** — use CSS modules or Tailwind classes only.
