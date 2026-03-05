@@ -64,7 +64,9 @@ for i, n in enumerate(nodes):
     exit 0
   fi
 
-  mapfile -t ISSUE_IDS <<< "$QUEUE"
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && ISSUE_IDS+=("$line")
+  done <<< "$QUEUE"
 fi
 
 TOTAL=${#ISSUE_IDS[@]}
@@ -86,13 +88,13 @@ sleep 3
 echo ""
 
 # ── Launch all issues in parallel ─────────────────────────────────────────────
-declare -A PIDS
+PIDS=()
 
 for ISSUE_ID in "${ISSUE_IDS[@]}"; do
   LOG="$LOGS_DIR/$ISSUE_ID.log"
   echo "▶ Starting $ISSUE_ID  (log: .claude/logs/$ISSUE_ID.log)"
   bash "$SCRIPT_DIR/run-issue.sh" "$ISSUE_ID" --worktree > "$LOG" 2>&1 &
-  PIDS[$ISSUE_ID]=$!
+  PIDS+=($!)
 done
 
 echo ""
@@ -104,8 +106,9 @@ PASSED=0
 FAILED=0
 FAILED_IDS=()
 
-for ISSUE_ID in "${!PIDS[@]}"; do
-  PID=${PIDS[$ISSUE_ID]}
+for i in "${!ISSUE_IDS[@]}"; do
+  ISSUE_ID="${ISSUE_IDS[$i]}"
+  PID="${PIDS[$i]}"
   wait "$PID"
   EXIT_CODE=$?
 

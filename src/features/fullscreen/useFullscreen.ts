@@ -12,7 +12,7 @@ export function useFullscreen() {
     () => isFullscreenSupported() && !!document.fullscreenElement
   )
   const [cursorHidden, setCursorHidden] = useState(false)
-  const cursorTimerRef = useRef(null)
+  const cursorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const toggleFullscreen = useCallback(() => {
     if (!isFullscreenSupported()) return
@@ -36,9 +36,9 @@ export function useFullscreen() {
   }, [])
 
   useEffect(() => {
-    const handleKeydown = (e) => {
+    const handleKeydown = (e: KeyboardEvent) => {
       if (e.ctrlKey || e.metaKey || e.altKey) return
-      if (INPUT_TAG_NAMES.has(e.target?.tagName)) return
+      if (INPUT_TAG_NAMES.has((e.target as HTMLElement | null)?.tagName ?? '')) return
       if (e.key === 'f' || e.key === 'F') {
         toggleFullscreen()
       }

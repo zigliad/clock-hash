@@ -23,19 +23,29 @@ if [ "$WORKTREE" = true ]; then
   WORKTREE_DIR="$REPO_ROOT/../clock-hash-$ISSUE_ID"
 
   echo "Creating worktree at $WORKTREE_DIR..."
-  git -C "$REPO_ROOT" worktree add "$WORKTREE_DIR" dev 2>&1
 
-  # Copy secrets into worktree (not tracked by git)
+  # Create a temp branch off dev — can't reuse dev itself if it's already checked out
+  TEMP_BRANCH="wt/$ISSUE_ID"
+  git -C "$REPO_ROOT" worktree add -b "$TEMP_BRANCH" "$WORKTREE_DIR" dev
+  if [ $? -ne 0 ]; then
+    echo "ERROR: Failed to create worktree for $ISSUE_ID"
+    exit 1
+  fi
+
+  # Copy secrets + untracked config into worktree
   cp "$REPO_ROOT/.env.local" "$WORKTREE_DIR/.env.local"
+  cp "$SCRIPT_DIR/mcp-config.json" "$WORKTREE_DIR/.claude/mcp-config.json" 2>/dev/null || true
 
   # Re-launch this script from inside the worktree (without --worktree to avoid loop)
   bash "$WORKTREE_DIR/.claude/run-issue.sh" "$ISSUE_ID"
   EXIT_CODE=$?
 
-  # Cleanup worktree after completion
+  # Cleanup worktree and temp branch after completion
   echo "Cleaning up worktree..."
-  git -C "$REPO_ROOT" worktree remove "$WORKTREE_DIR" --force 2>/dev/null
   rm -f "$WORKTREE_DIR/.env.local" 2>/dev/null
+  rm -f "$WORKTREE_DIR/.claude/mcp-config.json" 2>/dev/null
+  git -C "$REPO_ROOT" worktree remove "$WORKTREE_DIR" --force 2>/dev/null
+  git -C "$REPO_ROOT" branch -D "$TEMP_BRANCH" 2>/dev/null
 
   exit $EXIT_CODE
 fi

@@ -3,15 +3,24 @@ import { DEFAULT_TIMEZONES, getCityName } from '../../utils/timezones'
 
 const STORAGE_KEY = 'clock-hash-custom-timezones'
 
-function isValidTimezoneEntry(entry) {
-  return entry && typeof entry.zone === 'string' && typeof entry.label === 'string'
+interface TimezoneEntry {
+  zone: string
+  label: string
 }
 
-function loadTimezones() {
+function isValidTimezoneEntry(entry: unknown): entry is TimezoneEntry {
+  return (
+    !!entry &&
+    typeof (entry as TimezoneEntry).zone === 'string' &&
+    typeof (entry as TimezoneEntry).label === 'string'
+  )
+}
+
+function loadTimezones(): TimezoneEntry[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return DEFAULT_TIMEZONES
-    const parsed = JSON.parse(stored)
+    const parsed: unknown = JSON.parse(stored)
     if (!Array.isArray(parsed) || parsed.length !== DEFAULT_TIMEZONES.length) {
       return DEFAULT_TIMEZONES
     }
@@ -22,7 +31,7 @@ function loadTimezones() {
   }
 }
 
-function persist(timezones) {
+function persist(timezones: TimezoneEntry[]): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(timezones))
   } catch {
@@ -37,7 +46,7 @@ export function useCustomTimezones() {
     return timezones.some((tz, i) => tz.zone !== DEFAULT_TIMEZONES[i].zone)
   }, [timezones])
 
-  const updateTimezone = useCallback((index, ianaZone) => {
+  const updateTimezone = useCallback((index: number, ianaZone: string) => {
     setTimezones((prev) => {
       if (index < 0 || index >= prev.length) return prev
       const next = [...prev]
