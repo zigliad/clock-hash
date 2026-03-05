@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import App from '../App'
 import { STORAGE_KEY } from '../utils/timeFormat'
 
@@ -64,8 +64,10 @@ describe('App', () => {
   it('background color changes when a timezone card is clicked', () => {
     const { container } = render(<App />)
     const wrapper = container.firstChild
+    act(() => vi.advanceTimersByTime(16))
     const initialBg = wrapper.style.backgroundColor
     fireEvent.click(screen.getByText('Tokyo'))
+    act(() => vi.advanceTimersByTime(16))
     const newBg = wrapper.style.backgroundColor
     expect(newBg).not.toBe(initialBg)
   })
@@ -98,8 +100,10 @@ describe('App', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('Tokyo'))
     const wrapper = container.firstChild
+    act(() => vi.advanceTimersByTime(16))
     const bg24h = wrapper.style.backgroundColor
     fireEvent.click(screen.getByRole('button', { name: /time format/i }))
+    act(() => vi.advanceTimersByTime(16))
     const bg12h = wrapper.style.backgroundColor
     expect(bg12h).not.toBe(bg24h)
   })

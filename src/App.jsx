@@ -8,7 +8,8 @@ import { useColorHistory } from './hooks/useColorHistory'
 import { CountdownTimer } from './components/CountdownTimer'
 import { ColorInfoOverlay } from './components/ColorInfoOverlay'
 import { convertTo12Hour } from './utils/timeFormat'
-import { getLocalTime, timeToColor, getLightness } from './utils/clock'
+import { getLocalTime, timeToColor, getLightness, incrementTime } from './utils/clock'
+import { useColorTransition } from './hooks/useColorTransition'
 import { useNextBeautifulColor } from './hooks/useNextBeautifulColor'
 import { NextBeautifulColorLabel } from './components/NextBeautifulColorLabel'
 import { useFullscreen } from './hooks/useFullscreen'
@@ -31,7 +32,11 @@ function App() {
   const rawTime = activeZone ? getTimeForTimezone(activeZone) : getLocalTime()
   const time = is24h ? rawTime : convertTo12Hour(rawTime)
   const color = timeToColor(time)
-  const lightness = getLightness(color)
+  const nextRawTime = incrementTime(rawTime)
+  const nextTime = is24h ? nextRawTime : convertTo12Hour(nextRawTime)
+  const nextColor = timeToColor(nextTime)
+  const interpolatedColor = useColorTransition(color, nextColor)
+  const lightness = getLightness(interpolatedColor)
   const colorHistory = useColorHistory(color)
   const nextBeautiful = useNextBeautifulColor(is24h)
   const { isFullscreen, cursorHidden, toggleFullscreen } = useFullscreen()
@@ -50,7 +55,7 @@ function App() {
     <div
       className={styles.root}
       style={{
-        backgroundColor: color,
+        backgroundColor: interpolatedColor,
         color: textColor,
         cursor: cursorHidden ? 'none' : 'default',
       }}
