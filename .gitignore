@@ -16,6 +16,10 @@ dist-ssr
 .env*
 .claude/mcp-config.json
 .claude/.cr_approved
+.claude/screenshots/
+
+# Generated output (never commit)
+coverage/
 
 # Editor directories and files
 .vscode/*
