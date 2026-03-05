@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import WorldClocksBar from './WorldClocksBar'
 import TimeFormatToggle from './components/TimeFormatToggle'
+import ColorHistoryStrip from './components/ColorHistoryStrip'
 import { getTimeForTimezone } from './timezones'
 import { useTimeFormat } from './hooks/useTimeFormat'
+import { useColorHistory } from './hooks/useColorHistory'
 import { convertTo12Hour } from './utils/timeFormat'
 
 function App() {
@@ -20,6 +22,7 @@ function App() {
   const time = is24h ? rawTime : convertTo12Hour(rawTime)
   const color = timeToColor(time)
   const lightness = getLightness(color)
+  const colorHistory = useColorHistory(color)
 
   function handleSelectZone(zone) {
     setActiveZone((prev) => (prev === zone ? null : zone))
@@ -47,6 +50,7 @@ function App() {
       }}>
         {time}
       </div>
+      <ColorHistoryStrip history={colorHistory} />
     </div>
   )
 }
