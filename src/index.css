@@ -3,3 +3,12 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+@keyframes pulse-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pulse {
+  animation: pulse-flash 0.5s ease-in-out 6;
+}
