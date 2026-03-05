@@ -12,10 +12,15 @@ export function useColorTransition(currentColor, nextColor) {
 
   useEffect(() => {
     let rafId
+    let lastComputed = currentColor
 
     function tick() {
       const progress = (Date.now() % 1000) / 1000
-      setDisplayColor(lerpColor(currentColor, nextColor, progress))
+      const next = lerpColor(currentColor, nextColor, progress)
+      if (next !== lastComputed) {
+        lastComputed = next
+        setDisplayColor(next)
+      }
       rafId = requestAnimationFrame(tick)
     }
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { getLocalTime, timeToColor, getLightness } from './clock'
+import { getLocalTime, timeToColor, getLightness, incrementTime } from './clock'
 
 describe('clock utils', () => {
   describe('getLocalTime', () => {
@@ -41,6 +41,28 @@ describe('clock utils', () => {
 
     it('returns black for 12h format with AM/PM', () => {
       expect(timeToColor('02:30:00 AM')).toBe('#000000')
+    })
+  })
+
+  describe('incrementTime', () => {
+    it('increments seconds normally', () => {
+      expect(incrementTime('14:30:22')).toBe('14:30:23')
+    })
+
+    it('rolls over seconds to next minute', () => {
+      expect(incrementTime('14:30:59')).toBe('14:31:00')
+    })
+
+    it('rolls over minutes to next hour', () => {
+      expect(incrementTime('14:59:59')).toBe('15:00:00')
+    })
+
+    it('rolls over midnight', () => {
+      expect(incrementTime('23:59:59')).toBe('00:00:00')
+    })
+
+    it('handles start of day', () => {
+      expect(incrementTime('00:00:00')).toBe('00:00:01')
     })
   })
 

@@ -15,15 +15,3 @@ export function lerpColor(from, to, t) {
 
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
-
-export function incrementTime(hhmmss) {
-  const [h, m, s] = hhmmss.split(':').map(Number)
-  let totalSeconds = h * 3600 + m * 60 + s + 1
-  totalSeconds = totalSeconds % 86400
-
-  const newH = Math.floor(totalSeconds / 3600)
-  const newM = Math.floor((totalSeconds % 3600) / 60)
-  const newS = totalSeconds % 60
-
-  return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}:${String(newS).padStart(2, '0')}`
-}
