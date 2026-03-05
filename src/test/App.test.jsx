@@ -1,11 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from '../App'
+import { STORAGE_KEY } from '../utils/timeFormat'
 
 describe('App', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-03-05T12:00:00Z'))
+    localStorage.clear()
   })
 
   afterEach(() => {
@@ -59,9 +61,62 @@ describe('App', () => {
     expect(wrapper.style.backgroundColor).toBeTruthy()
   })
 
+  it('background color changes when a timezone card is clicked', () => {
+    const { container } = render(<App />)
+    const wrapper = container.firstChild
+    const initialBg = wrapper.style.backgroundColor
+    fireEvent.click(screen.getByText('Tokyo'))
+    const newBg = wrapper.style.backgroundColor
+    expect(newBg).not.toBe(initialBg)
+  })
+
   it('no timezone is active by default (local time shown)', () => {
     render(<App />)
     const cards = document.querySelectorAll('[data-testid="tz-card"]')
     expect(cards.length).toBe(5)
+  })
+
+  it('renders the 12h/24h toggle button', () => {
+    render(<App />)
+    expect(screen.getByRole('button', { name: /time format/i })).toBeInTheDocument()
+  })
+
+  it('defaults to 24h mode', () => {
+    render(<App />)
+    expect(screen.getByText('24h')).toBeInTheDocument()
+  })
+
+  it('switches to 12h display when toggle is clicked', () => {
+    const { container } = render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /time format/i }))
+    expect(screen.getByText('12h')).toBeInTheDocument()
+    const mainClockDiv = container.querySelector('div[style*="flex: 1"]')
+    expect(mainClockDiv.textContent).toMatch(/^(0[1-9]|1[0-2]):\d{2}:\d{2}$/)
+  })
+
+  it('updates background color immediately on toggle', () => {
+    const { container } = render(<App />)
+    fireEvent.click(screen.getByText('Tokyo'))
+    const wrapper = container.firstChild
+    const bg24h = wrapper.style.backgroundColor
+    fireEvent.click(screen.getByRole('button', { name: /time format/i }))
+    const bg12h = wrapper.style.backgroundColor
+    expect(bg12h).not.toBe(bg24h)
+  })
+
+  it('persists format across re-renders via localStorage', () => {
+    const { unmount } = render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /time format/i }))
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('12h')
+    unmount()
+    render(<App />)
+    expect(screen.getByText('12h')).toBeInTheDocument()
+  })
+
+  it('world clock cards also switch to 12h format', () => {
+    render(<App />)
+    expect(screen.getByText('21:00:00')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: /time format/i }))
+    expect(screen.getByText('09:00:00')).toBeInTheDocument()
   })
 })

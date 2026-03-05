@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react'
 import WorldClocksBar from './WorldClocksBar'
+import TimeFormatToggle from './components/TimeFormatToggle'
 import { getTimeForTimezone } from './timezones'
+import { useTimeFormat } from './hooks/useTimeFormat'
+import { convertTo12Hour } from './utils/timeFormat'
 
 function App() {
   const [activeZone, setActiveZone] = useState(null)
   const [tick, setTick] = useState(0)
+  const { is24h, toggle } = useTimeFormat()
 
   useEffect(() => {
     const interval = setInterval(() => setTick((t) => t + 1), 1000)
@@ -12,7 +16,8 @@ function App() {
   }, [])
 
   void tick
-  const time = getDisplayTime(activeZone)
+  const rawTime = getDisplayTime(activeZone)
+  const time = is24h ? rawTime : convertTo12Hour(rawTime)
   const color = timeToColor(time)
   const lightness = getLightness(color)
 
@@ -29,8 +34,10 @@ function App() {
       flexDirection: 'column',
       transition: 'background-color 1s, color 1s',
       fontFamily: 'monospace',
+      position: 'relative',
     }}>
-      <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} />
+      <TimeFormatToggle is24h={is24h} onToggle={toggle} />
+      <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} is24h={is24h} />
       <div style={{
         flex: 1,
         display: 'flex',
