@@ -7,12 +7,20 @@ BRANCH="dev"
 
 echo "Setting branch protection for $REPO/$BRANCH..."
 
-gh api "repos/$REPO/branches/$BRANCH/protection" \
+echo '{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["Test & Lint"]
+  },
+  "enforce_admins": false,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 0,
+    "dismiss_stale_reviews": true
+  },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}' | gh api "repos/$REPO/branches/$BRANCH/protection" \
   --method PUT \
-  --field required_status_checks='{"strict":true,"contexts":["Test & Lint"]}' \
-  --field enforce_admins=false \
-  --field required_pull_request_reviews='{"required_approving_review_count":0,"dismiss_stale_reviews":true}' \
-  --field restrictions=null \
-  --field allow_force_pushes=false \
-  --field allow_deletions=false \
+  --input - \
   --silent && echo "✓ Branch protection enabled on $BRANCH" || echo "✗ Failed — make sure 'dev' branch exists on GitHub and gh is authenticated"

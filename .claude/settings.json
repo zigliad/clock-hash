@@ -14,6 +14,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "echo $CLAUDE_TOOL_INPUT | grep -qE '\\.(jsx?|tsx?|css)' && npx prettier --write $(echo $CLAUDE_TOOL_INPUT | grep -oE '[^ ]+\\.(jsx?|tsx?|css)' | head -1) 2>/dev/null || true"
+          },
+          {
+            "type": "command",
             "command": "npm test --passWithNoTests 2>&1 | tail -5"
           }
         ]

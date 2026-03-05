@@ -30,6 +30,7 @@
     "globals": "^16.5.0",
     "jsdom": "^28.1.0",
     "linear-mcp-server": "^0.1.0",
+    "prettier": "^3.8.1",
     "vite": "^7.3.1",
     "vitest": "^4.0.18"
   }
