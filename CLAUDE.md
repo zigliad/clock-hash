@@ -15,8 +15,8 @@ fix/LIN-{issue-id}-{kebab-slug}
 chore/LIN-{issue-id}-{kebab-slug}
 
 ## Base Branch
-Always branch off `master` and merge back to `master`.
-`git checkout master && git pull origin master` before creating a new branch.
+Always branch off `dev` and merge back to `dev`.
+`git checkout dev && git pull origin dev` before creating a new branch.
 
 ## Test Strategy
 - Unit: vitest for pure functions, hooks, utils
@@ -42,7 +42,7 @@ Find real bugs, security issues, missing edge cases, test gaps.
 Be adversarial. Output ONLY valid JSON:
 { verdict: APPROVED | CHANGES_REQUESTED,
   findings: [{ severity: HIGH|MED|LOW, file, line, issue }] }"
-Give the reviewer: git diff of feature branch vs master
+Give the reviewer: git diff of feature branch vs dev
 
 ### Step 2 — Fix Loop (silent, no Linear comments)
 IF verdict == CHANGES_REQUESTED:
@@ -57,20 +57,13 @@ IF still failing after round 3:
   - Post to Slack: same message + diff summary
   - STOP. Do not merge.
 
-### Step 3 — Notify Before Merge (when APPROVED)
-1. Post to Slack #dev-merges:
-   "LIN-{ID} ready to merge to master
-   PR: {url} | Tests: OK | Lint: OK | Security: OK | CR: OK
-   Merging in 5 min unless you reply STOP"
-2. Comment on Linear issue with PR link + merge intent
-3. Wait 300 seconds
-4. Check Slack for STOP reply — if found, abort
-
-### Step 4 — Auto-Merge
-gh pr merge {PR} --squash --delete-branch
-git checkout master && git pull origin master
-Move Linear issue to: Done
-Post Slack: LIN-{ID} merged to master.
+### Step 3 — Auto-Merge (when APPROVED)
+1. Write .claude/.cr_approved marker file
+2. Run merge gate: bash .claude/merge-gate.sh
+3. gh pr merge {PR} --squash --delete-branch
+4. git checkout dev && git pull origin dev
+5. Move Linear issue to: Done
+6. Post to Slack #dev-merges: "LIN-{ID} merged to dev. PR: {url} | Commit: {sha}"
 
 ## Definition of Done
 - Tests: all passing
@@ -78,6 +71,57 @@ Post Slack: LIN-{ID} merged to master.
 - Security: no HIGH or CRITICAL findings
 - Self-CR: APPROVED verdict received
 - PR: opened and linked to Linear issue
-- Notify: Slack + Linear comment sent
-- Merge: squash-merged to master
+- Merge: squash-merged to dev
 - Linear: issue moved to Done
+- Slack: merge confirmation posted
+
+---
+
+## Coding Conventions
+
+These rules are enforced during Self-CR. Violations are treated as MED findings.
+
+### File Size
+- Max 200 lines per file. If a file exceeds this, split it.
+- One concept per file: one component, one hook, one util module.
+
+### SOLID Principles
+- **Single Responsibility**: every function, hook, and component does exactly one thing.
+  If you need "and" to describe what it does, split it.
+- **Open/Closed**: extend behaviour via props/composition, not by modifying existing components.
+- **Liskov Substitution**: components/functions should be replaceable with variants
+  without breaking callers.
+- **Interface Segregation**: don't pass props a component doesn't use. Compose small
+  focused interfaces rather than one large object.
+- **Dependency Inversion**: depend on abstractions (props, callbacks, context) not
+  concrete implementations. Inject dependencies; don't hardcode them.
+
+### React-Specific
+- Extract all non-trivial logic into custom hooks (`use` prefix). Components render, hooks think.
+- No component longer than ~80 lines. If it is, extract sub-components or hooks.
+- No prop drilling beyond 2 levels. Use context or composition instead.
+- Prefer pure, stateless components. Lift state only as high as needed.
+- Co-locate tests with source: `MyComponent.test.jsx` next to `MyComponent.jsx`.
+
+### Functions & Logic
+- Pure functions wherever possible — no hidden side effects.
+- Max 3 parameters per function. Group related params into an object.
+- No magic numbers or strings — use named constants.
+- Early returns over nested conditionals.
+- Avoid comments that explain "what" — write self-documenting code.
+  Comments should only explain "why" when the reason is non-obvious.
+
+### Naming
+- Components: PascalCase (`WorldClockCard`)
+- Hooks: camelCase with `use` prefix (`useWorldClock`)
+- Utils/constants: camelCase (`formatTime`, `DEFAULT_TIMEZONES`)
+- Test files: `{name}.test.jsx` or `{name}.test.js`
+
+### Structure
+```
+src/
+  components/    # Pure UI components, no business logic
+  hooks/         # Custom React hooks
+  utils/         # Pure functions, helpers, constants
+  test/          # Global test setup only
+```
