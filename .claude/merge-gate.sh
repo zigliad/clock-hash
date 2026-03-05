@@ -26,16 +26,20 @@ if [ $? -ne 0 ]; then
 fi
 echo "✓ Lint clean"
 
-# 3. No HIGH/CRITICAL security findings from Semgrep
-echo "Checking security (semgrep)..."
-FINDINGS=$(npx semgrep --config=auto src/ --json 2>/dev/null | \
-  python3 -c "import sys,json; r=json.load(sys.stdin); \
-  print(len([f for f in r.get('results',[]) if f.get('extra',{}).get('severity') in ['ERROR','WARNING']]))")
-if [ "$FINDINGS" -gt 0 ]; then
-  echo "BLOCK: $FINDINGS security findings — run 'npx semgrep --config=auto src/' and fix HIGH/CRITICAL items."
-  exit 1
+# 3. No HIGH/CRITICAL security findings from Semgrep (skipped if not installed)
+if command -v semgrep &>/dev/null; then
+  echo "Checking security (semgrep)..."
+  FINDINGS=$(semgrep --config=auto src/ --json 2>/dev/null | \
+    python3 -c "import sys,json; r=json.load(sys.stdin); \
+    print(len([f for f in r.get('results',[]) if f.get('extra',{}).get('severity') in ['ERROR','WARNING']]))")
+  if [ "$FINDINGS" -gt 0 ]; then
+    echo "BLOCK: $FINDINGS security findings — run 'semgrep --config=auto src/' and fix HIGH/CRITICAL items."
+    exit 1
+  fi
+  echo "✓ Security scan clean"
+else
+  echo "⚠ Semgrep not installed — skipping security scan (run 'brew install semgrep' to enable)"
 fi
-echo "✓ Security scan clean"
 
 # 4. Self-CR must have been approved (reviewer agent writes this file)
 if [ ! -f .claude/.cr_approved ]; then

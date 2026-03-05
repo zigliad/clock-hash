@@ -63,7 +63,6 @@ IF still failing after round 3:
 3. gh pr merge {PR} --squash --delete-branch
 4. git checkout dev && git pull origin dev
 5. Move Linear issue to: Done
-6. Post to Slack #dev-merges: "LIN-{ID} merged to dev. PR: {url} | Commit: {sha}"
 
 ## Definition of Done
 - Tests: all passing
@@ -73,7 +72,6 @@ IF still failing after round 3:
 - PR: opened and linked to Linear issue
 - Merge: squash-merged to dev
 - Linear: issue moved to Done
-- Slack: merge confirmation posted
 
 ---
 

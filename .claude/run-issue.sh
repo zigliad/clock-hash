@@ -1,6 +1,6 @@
 #!/bin/bash
 # Usage: .claude/run-issue.sh IAI-15
-# Launches Claude Code pointed at a specific Linear issue.
+# Launches Claude Code pointed at a specific Linear issue, with live streaming output.
 
 ISSUE_ID=$1
 
@@ -21,16 +21,68 @@ Work on Linear issue $ISSUE_ID in the Iaig workspace.
 4. Create branch: feature/$ISSUE_ID-{kebab-slug}
 5. Write tests first — confirm RED — then implement until GREEN
 6. Follow ALL coding conventions in CLAUDE.md (SOLID, file size, naming, structure)
-7. npm run lint && npx semgrep --config=auto src/
+7. npm run lint && (command -v semgrep &>/dev/null && semgrep --config=auto src/ || echo "semgrep not installed, skipping")
 8. Self-CR protocol (CLAUDE.md) — reviewer checks conventions too — max 3 rounds
-9. When APPROVED: run merge-gate.sh, commit, push, open PR, merge --squash, close issue, post Slack
+9. When APPROVED: run merge-gate.sh, commit, push, open PR, merge --squash, close Linear issue
 
 Do not stop until the issue is Done."
 
-echo "Starting Claude Code for $ISSUE_ID..."
+echo "================================================"
+echo "  Claude Code — $ISSUE_ID"
+echo "================================================"
 echo ""
 
 claude --mcp-config "$(dirname "$0")/mcp-config.json" \
   --dangerously-skip-permissions \
   --verbose \
-  -p "$PROMPT"
+  --output-format stream-json \
+  -p "$PROMPT" | python3 -u -c "
+import sys, json
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        ev = json.loads(line)
+    except json.JSONDecodeError:
+        print(line)
+        continue
+
+    t = ev.get('type', '')
+
+    if t == 'assistant':
+        for block in ev.get('message', {}).get('content', []):
+            if block.get('type') == 'text':
+                print(block['text'], end='', flush=True)
+            elif block.get('type') == 'tool_use':
+                name = block.get('name', '')
+                inp  = block.get('input', {})
+                # Show bash commands
+                if 'command' in inp:
+                    print(f'\n[bash] {inp[\"command\"]}', flush=True)
+                # Show file writes
+                elif 'file_path' in inp and name in ('Write', 'Edit'):
+                    print(f'\n[{name}] {inp[\"file_path\"]}', flush=True)
+                # Show MCP calls
+                elif name.startswith('mcp'):
+                    print(f'\n[mcp]  {name}({list(inp.keys())})', flush=True)
+                else:
+                    print(f'\n[{name}]', flush=True)
+
+    elif t == 'tool_result':
+        content = ev.get('content', '')
+        if isinstance(content, list):
+            for c in content:
+                if c.get('type') == 'text':
+                    text = c['text'][:300]
+                    print(f'  → {text}', flush=True)
+        elif isinstance(content, str) and content.strip():
+            print(f'  → {content.strip()[:300]}', flush=True)
+
+    elif t == 'result':
+        print(f'\n================================================', flush=True)
+        print(f'  Done — {ev.get(\"subtype\",\"\")}', flush=True)
+        print(f'  Cost: \${ev.get(\"cost_usd\", 0):.4f}  |  Turns: {ev.get(\"num_turns\", \"?\")}', flush=True)
+        print(f'================================================', flush=True)
+"

@@ -85,7 +85,7 @@ STEP 6 — Ship
 - gh pr merge --squash --delete-branch
 - git checkout dev && git pull origin dev
 - Move Linear issue to Done via MCP
-- Post to Slack #dev-merges: "{ISSUE-ID} merged to dev. PR: {url}"
+- Linear issue moved to Done via MCP
 
 Do not ask for clarification. Make reasonable assumptions and document them in the PR body.
 Do not stop until the issue is Done.
@@ -109,7 +109,7 @@ Work on Linear issue {ISSUE-ID} in the zigliad workspace.
 6. Follow ALL coding conventions in CLAUDE.md (SOLID, file size, naming, structure)
 7. npm run lint && npx semgrep --config=auto src/
 8. Self-CR protocol (CLAUDE.md) — reviewer checks conventions too — max 3 rounds
-9. When APPROVED: run merge-gate.sh, commit, push, open PR, merge --squash, close issue, post Slack
+9. When APPROVED: run merge-gate.sh, commit, push, open PR, merge --squash, close Linear issue
 
 Do not stop until the issue is Done.
 ```
