@@ -1,4 +1,14 @@
-function ColorHistoryStrip({ history = [] }) {
+interface ColorHistoryEntry {
+  id: number
+  time: string
+  hex: string
+}
+
+interface ColorHistoryStripProps {
+  history?: ColorHistoryEntry[]
+}
+
+function ColorHistoryStrip({ history = [] }: ColorHistoryStripProps) {
   return (
     <div
       data-testid="color-history-strip"

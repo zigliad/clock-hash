@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { useTimeFormat } from './useTimeFormat'
-import { FORMAT_24H, FORMAT_12H, STORAGE_KEY } from '../../utils/timeFormat'
+import { FORMAT_12H, STORAGE_KEY } from '../../utils/timeFormat'
 
 describe('useTimeFormat', () => {
   beforeEach(() => {

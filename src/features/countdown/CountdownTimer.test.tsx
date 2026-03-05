@@ -28,7 +28,7 @@ describe('CountdownTimer', () => {
     fireEvent.click(screen.getByRole('button', { name: /set target/i }))
     const input = screen.getByLabelText(/target time/i)
     fireEvent.change(input, { target: { value: '17:00' } })
-    fireEvent.submit(input.closest('form'))
+    fireEvent.submit(input.closest('form')!)
 
     expect(screen.getByText(/in 2h 30m 00s/)).toBeInTheDocument()
   })
@@ -38,7 +38,7 @@ describe('CountdownTimer', () => {
     fireEvent.click(screen.getByRole('button', { name: /set target/i }))
     const input = screen.getByLabelText(/target time/i)
     fireEvent.change(input, { target: { value: '17:00' } })
-    fireEvent.submit(input.closest('form'))
+    fireEvent.submit(input.closest('form')!)
 
     expect(screen.getByRole('button', { name: /clear/i })).toBeInTheDocument()
   })
@@ -48,7 +48,7 @@ describe('CountdownTimer', () => {
     fireEvent.click(screen.getByRole('button', { name: /set target/i }))
     const input = screen.getByLabelText(/target time/i)
     fireEvent.change(input, { target: { value: '17:00' } })
-    fireEvent.submit(input.closest('form'))
+    fireEvent.submit(input.closest('form')!)
 
     fireEvent.click(screen.getByRole('button', { name: /clear/i }))
     expect(screen.getByRole('button', { name: /set target/i })).toBeInTheDocument()
@@ -60,13 +60,13 @@ describe('CountdownTimer', () => {
     fireEvent.click(screen.getByRole('button', { name: /set target/i }))
     const input = screen.getByLabelText(/target time/i)
     fireEvent.change(input, { target: { value: '14:31' } })
-    fireEvent.submit(input.closest('form'))
+    fireEvent.submit(input.closest('form')!)
 
     act(() => {
       vi.advanceTimersByTime(60 * 1000)
     })
 
     const wrapper = container.querySelector('[data-testid="countdown-timer"]')
-    expect(wrapper.className).toContain('pulse')
+    expect((wrapper as HTMLElement).className).toContain('pulse')
   })
 })

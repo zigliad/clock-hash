@@ -3,8 +3,8 @@ import { renderHook, act } from '@testing-library/react'
 import { useColorTransition } from './useColorTransition'
 
 describe('useColorTransition', () => {
-  let rafCallbacks
-  let rafId
+  let rafCallbacks: FrameRequestCallback[]
+  let rafId: number
 
   beforeEach(() => {
     rafCallbacks = []
@@ -48,7 +48,7 @@ describe('useColorTransition', () => {
 
     // Flush one rAF frame
     act(() => {
-      if (rafCallbacks.length > 0) rafCallbacks[rafCallbacks.length - 1]()
+      if (rafCallbacks.length > 0) rafCallbacks[rafCallbacks.length - 1](0)
     })
 
     // At t=0.5, should be approximately #808080
@@ -62,7 +62,7 @@ describe('useColorTransition', () => {
     )
 
     act(() => {
-      if (rafCallbacks.length > 0) rafCallbacks[rafCallbacks.length - 1]()
+      if (rafCallbacks.length > 0) rafCallbacks[rafCallbacks.length - 1](0)
     })
 
     expect(result.current).toBe('#ff0000')
@@ -74,13 +74,12 @@ describe('useColorTransition', () => {
       { initialProps: { from: '#000000', to: '#ffffff' } }
     )
 
-    const callsBefore = window.requestAnimationFrame.mock.calls.length
+    const rafSpy = window.requestAnimationFrame as ReturnType<typeof vi.fn>
+    const callsBefore = rafSpy.mock.calls.length
 
     rerender({ from: '#ff0000', to: '#00ff00' })
 
     expect(window.cancelAnimationFrame).toHaveBeenCalled()
-    expect(window.requestAnimationFrame.mock.calls.length).toBeGreaterThan(
-      callsBefore
-    )
+    expect(rafSpy.mock.calls.length).toBeGreaterThan(callsBefore)
   })
 })

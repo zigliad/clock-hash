@@ -26,21 +26,21 @@ describe('useCountdown', () => {
 
   it('ticks down each second', () => {
     const { result } = renderHook(() => useCountdown('17:00'))
-    expect(result.current.remaining.minutes).toBe(30)
+    expect(result.current.remaining!.minutes).toBe(30)
 
     act(() => {
       vi.advanceTimersByTime(1000)
     })
-    expect(result.current.remaining.seconds).toBe(59)
-    expect(result.current.remaining.minutes).toBe(29)
+    expect(result.current.remaining!.seconds).toBe(59)
+    expect(result.current.remaining!.minutes).toBe(29)
   })
 
   it('treats past times as tomorrow', () => {
     const { result } = renderHook(() => useCountdown('10:00'))
     // 10:00 is before 14:30, so it should be tomorrow
     // remaining = 24h - 4h30m = 19h30m
-    expect(result.current.remaining.hours).toBe(19)
-    expect(result.current.remaining.minutes).toBe(30)
+    expect(result.current.remaining!.hours).toBe(19)
+    expect(result.current.remaining!.minutes).toBe(30)
   })
 
   it('sets reached to true when countdown hits zero', () => {

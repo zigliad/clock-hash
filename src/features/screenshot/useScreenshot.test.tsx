@@ -4,12 +4,37 @@ import { useScreenshot } from './useScreenshot'
 
 const originalCreateElement = Document.prototype.createElement
 
+interface MockContext {
+  fillRect: ReturnType<typeof vi.fn>
+  fillText: ReturnType<typeof vi.fn>
+  measureText: ReturnType<typeof vi.fn>
+  textAlign: string
+  textBaseline: string
+  font: string
+  fillStyle: string
+}
+
+interface MockCanvas {
+  getContext: ReturnType<typeof vi.fn>
+  toDataURL: ReturnType<typeof vi.fn>
+  width: number
+  height: number
+}
+
+interface MockLink {
+  href: string
+  download: string
+  click: ReturnType<typeof vi.fn>
+}
+
 describe('useScreenshot', () => {
-  let mockContext
-  let mockCanvas
-  let mockLink
-  let mockAppendChild
-  let mockRemoveChild
+  let mockContext: MockContext
+  let mockCanvas: MockCanvas
+  let mockLink: MockLink
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockAppendChild: (node: any) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockRemoveChild: (node: any) => void
 
   beforeEach(() => {
     mockContext = {
@@ -31,19 +56,21 @@ describe('useScreenshot', () => {
     mockRemoveChild = vi.fn()
     const origAppend = document.body.appendChild.bind(document.body)
     const origRemove = document.body.removeChild.bind(document.body)
-    document.body.appendChild = function (node) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    document.body.appendChild = function (node: any) {
       if (node === mockLink) { mockAppendChild(node); return node }
       return origAppend(node)
     }
-    document.body.removeChild = function (node) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    document.body.removeChild = function (node: any) {
       if (node === mockLink) { mockRemoveChild(node); return node }
       return origRemove(node)
     }
-    Document.prototype.createElement = function (tag) {
-      if (tag === 'canvas') return mockCanvas
+    Document.prototype.createElement = function (tag: string) {
+      if (tag === 'canvas') return mockCanvas as unknown as HTMLCanvasElement
       if (tag === 'a') {
         mockLink = { href: '', download: '', click: vi.fn() }
-        return mockLink
+        return mockLink as unknown as HTMLAnchorElement
       }
       return originalCreateElement.call(this, tag)
     }
@@ -82,7 +109,7 @@ describe('useScreenshot', () => {
       })
     })
     const fillTextCalls = mockContext.fillText.mock.calls
-    const timeCall = fillTextCalls.find((c) => c[0] === '14:30:22')
+    const timeCall = fillTextCalls.find((c: unknown[]) => c[0] === '14:30:22')
     expect(timeCall).toBeDefined()
   })
 
@@ -96,7 +123,7 @@ describe('useScreenshot', () => {
       })
     })
     const fillTextCalls = mockContext.fillText.mock.calls
-    const hexCall = fillTextCalls.find((c) => c[0] === '#143022')
+    const hexCall = fillTextCalls.find((c: unknown[]) => c[0] === '#143022')
     expect(hexCall).toBeDefined()
   })
 

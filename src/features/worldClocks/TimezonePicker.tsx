@@ -3,23 +3,29 @@ import { getCityName } from '../../utils/timezones'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-let ALL_TIMEZONES = []
+let ALL_TIMEZONES: string[] = []
 try {
-  ALL_TIMEZONES = Intl.supportedValuesOf('timeZone')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ALL_TIMEZONES = (Intl as any).supportedValuesOf('timeZone') as string[]
 } catch {
   ALL_TIMEZONES = ['UTC']
 }
 
-export function TimezonePicker({ onSelect, onClose }) {
+interface TimezonePickerProps {
+  onSelect: (ianaZone: string) => void
+  onClose: () => void
+}
+
+export function TimezonePicker({ onSelect, onClose }: TimezonePickerProps) {
   const [query, setQuery] = useState('')
-  const inputRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
   useEffect(() => {
-    function handleKeyDown(e) {
+    function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', handleKeyDown)
@@ -43,7 +49,7 @@ export function TimezonePicker({ onSelect, onClose }) {
           type="text"
           placeholder="Search timezone..."
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
           className="flex-1 bg-white/10 border-white/30 text-white placeholder:text-white/50"
         />
         <Button

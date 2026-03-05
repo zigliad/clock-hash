@@ -1,7 +1,12 @@
 import { useMemo } from 'react'
 import { formatColorInfo } from '../../utils/colorInfo'
 
-export function ColorInfoOverlay({ hex, textColor }) {
+interface ColorInfoOverlayProps {
+  hex: string
+  textColor: string
+}
+
+export function ColorInfoOverlay({ hex, textColor }: ColorInfoOverlayProps) {
   const info = useMemo(() => formatColorInfo(hex), [hex])
 
   return (

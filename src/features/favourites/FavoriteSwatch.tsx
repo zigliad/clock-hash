@@ -1,7 +1,20 @@
 import { cn } from '@/utils/cn'
 
-export function FavoriteSwatch({ favorite, isActive, onSelect, onDelete }) {
-  function handleKeyDown(e) {
+interface FavoriteItem {
+  id: string
+  hex: string
+  time: string
+}
+
+interface FavoriteSwatchProps {
+  favorite: FavoriteItem
+  isActive: boolean
+  onSelect: (id: string) => void
+  onDelete: (id: string) => void
+}
+
+export function FavoriteSwatch({ favorite, isActive, onSelect, onDelete }: FavoriteSwatchProps) {
+  function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
       onSelect(favorite.id)

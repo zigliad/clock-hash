@@ -1,6 +1,11 @@
 import { Button } from '@/components/ui/button'
 
-function TimeFormatToggle({ is24h, onToggle }) {
+interface TimeFormatToggleProps {
+  is24h: boolean
+  onToggle: () => void
+}
+
+function TimeFormatToggle({ is24h, onToggle }: TimeFormatToggleProps) {
   return (
     <Button
       type="button"

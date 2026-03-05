@@ -9,13 +9,15 @@ const MODE_INPUT = 'input'
 const MODE_COUNTING = 'counting'
 const CONTAINER_CLASSES = 'flex items-center justify-center gap-2 p-2 text-lg'
 
+type Mode = 'idle' | 'input' | 'counting'
+
 export function CountdownTimer() {
-  const [mode, setMode] = useState(MODE_IDLE)
-  const [targetTime, setTargetTime] = useState(null)
+  const [mode, setMode] = useState<Mode>(MODE_IDLE)
+  const [targetTime, setTargetTime] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState('')
   const { display, reached } = useCountdown(targetTime)
 
-  function handleSubmit(e) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (isValidTimeInput(inputValue)) {
       setTargetTime(inputValue)
@@ -42,8 +44,8 @@ export function CountdownTimer() {
             aria-label="Target time"
             type="time"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Escape' && handleCancel()}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Escape' && handleCancel()}
             className="font-mono text-base py-1 px-2 bg-white/20 border-current"
           />
           <Button type="submit" variant="outline" size="sm" className="font-mono">

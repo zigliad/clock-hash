@@ -33,37 +33,37 @@ describe('App', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('Tokyo'))
     const mainClockDiv = container.querySelector('[data-testid="main-clock"]')
-    expect(mainClockDiv.textContent).toBe('21:00:00')
+    expect(mainClockDiv!.textContent).toBe('21:00:00')
   })
 
   it('clicking the active timezone again returns to local time', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('Tokyo'))
     const mainClockDiv = container.querySelector('[data-testid="main-clock"]')
-    expect(mainClockDiv.textContent).toBe('21:00:00')
+    expect(mainClockDiv!.textContent).toBe('21:00:00')
     // Click Tokyo again to deselect
     fireEvent.click(screen.getByText('Tokyo'))
     // Should return to local time (14:00:00 in IST at noon UTC)
-    expect(mainClockDiv.textContent).toMatch(/\d{2}:\d{2}:\d{2}/)
-    expect(mainClockDiv.textContent).not.toBe('21:00:00')
+    expect(mainClockDiv!.textContent).toMatch(/\d{2}:\d{2}:\d{2}/)
+    expect(mainClockDiv!.textContent).not.toBe('21:00:00')
   })
 
   it('maintains full-viewport background color based on time', () => {
     const { container } = render(<App />)
-    const wrapper = container.firstChild
+    const wrapper = container.firstChild as HTMLElement
     expect(wrapper.style.backgroundColor).toBeTruthy()
   })
 
   it('sets background color derived from current time as hex', () => {
     const { container } = render(<App />)
-    const wrapper = container.firstChild
+    const wrapper = container.firstChild as HTMLElement
     // At noon UTC+2 local = 14:00:00, color = #140000
     expect(wrapper.style.backgroundColor).toBeTruthy()
   })
 
   it('background color changes when a timezone card is clicked', () => {
     const { container } = render(<App />)
-    const wrapper = container.firstChild
+    const wrapper = container.firstChild as HTMLElement
     act(() => vi.advanceTimersByTime(16))
     const initialBg = wrapper.style.backgroundColor
     fireEvent.click(screen.getByText('Tokyo'))
@@ -93,13 +93,13 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: /time format/i }))
     expect(screen.getByText('12h')).toBeInTheDocument()
     const mainClockDiv = container.querySelector('[data-testid="main-clock"]')
-    expect(mainClockDiv.textContent).toMatch(/^(0[1-9]|1[0-2]):\d{2}:\d{2}$/)
+    expect(mainClockDiv!.textContent).toMatch(/^(0[1-9]|1[0-2]):\d{2}:\d{2}$/)
   })
 
   it('updates background color immediately on toggle', () => {
     const { container } = render(<App />)
     fireEvent.click(screen.getByText('Tokyo'))
-    const wrapper = container.firstChild
+    const wrapper = container.firstChild as HTMLElement
     act(() => vi.advanceTimersByTime(16))
     const bg24h = wrapper.style.backgroundColor
     fireEvent.click(screen.getByRole('button', { name: /time format/i }))

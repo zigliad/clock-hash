@@ -38,7 +38,7 @@ describe('TimezonePicker', () => {
       target: { value: 'dubai' },
     })
     const option = container.querySelector('li button')
-    fireEvent.click(option)
+    fireEvent.click(option!)
     expect(onSelect).toHaveBeenCalledWith('Asia/Dubai')
   })
 

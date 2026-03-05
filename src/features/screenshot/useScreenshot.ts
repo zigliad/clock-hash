@@ -10,7 +10,7 @@ const HEX_PADDING_BOTTOM = 30
 const FILENAME_PREFIX = 'clock-hash'
 
 export function useScreenshot() {
-  const takeScreenshot = useCallback(({ time, hex, textColor }) => {
+  const takeScreenshot = useCallback(({ time, hex, textColor }: { time: string; hex: string; textColor: string }) => {
     if (!time || !hex || !textColor) return
 
     const canvas = document.createElement('canvas')

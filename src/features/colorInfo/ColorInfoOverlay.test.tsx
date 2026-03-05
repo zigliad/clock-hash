@@ -20,7 +20,7 @@ describe('ColorInfoOverlay', () => {
 
   it('adapts text color based on textColor prop', () => {
     const { container } = render(<ColorInfoOverlay hex="#ffffff" textColor="#000" />)
-    const overlay = container.firstChild
+    const overlay = container.firstChild as HTMLElement
     expect(overlay.style.color).toBe('rgb(0, 0, 0)')
   })
 

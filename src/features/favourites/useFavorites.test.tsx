@@ -37,7 +37,7 @@ describe('useFavorites', () => {
     act(() => {
       result.current.addFavorite({ time: '14:30:22', hex: '#143022', timezone: 'local' })
     })
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
     expect(stored).toHaveLength(1)
     expect(stored[0].hex).toBe('#143022')
   })
@@ -103,7 +103,7 @@ describe('useFavorites', () => {
     act(() => {
       result.current.removeFavorite(id)
     })
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY))
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)!)
     expect(stored).toHaveLength(0)
   })
 

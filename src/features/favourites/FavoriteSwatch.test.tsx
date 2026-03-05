@@ -8,7 +8,7 @@ describe('FavoriteSwatch', () => {
   it('renders the color swatch with correct background', () => {
     render(<FavoriteSwatch favorite={mockFav} isActive={false} onSelect={() => {}} onDelete={() => {}} />)
     const swatch = screen.getByTestId('swatch-1')
-    expect(swatch.querySelector('[data-testid="swatch-color-1"]').style.backgroundColor).toBe('rgb(20, 48, 34)')
+    expect((swatch.querySelector('[data-testid="swatch-color-1"]') as HTMLElement).style.backgroundColor).toBe('rgb(20, 48, 34)')
   })
 
   it('displays hex code', () => {

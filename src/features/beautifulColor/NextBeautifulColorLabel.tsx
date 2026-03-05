@@ -1,4 +1,10 @@
-export function NextBeautifulColorLabel({ label, display, textColor }) {
+interface NextBeautifulColorLabelProps {
+  label: string | null
+  display: string | null
+  textColor: string
+}
+
+export function NextBeautifulColorLabel({ label, display, textColor }: NextBeautifulColorLabelProps) {
   if (!label || !display) return null
 
   return (
