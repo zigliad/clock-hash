@@ -1,15 +1,10 @@
 import { TIMEZONES, getTimeForTimezone } from './timezones'
 import { convertTo12Hour } from './utils/timeFormat'
+import styles from './WorldClocksBar.module.css'
 
 function WorldClocksBar({ activeZone, onSelectZone, is24h = true }) {
   return (
-    <div style={{
-      display: 'flex',
-      gap: '12px',
-      padding: '16px',
-      justifyContent: 'center',
-      flexWrap: 'wrap',
-    }}>
+    <div className={styles.bar}>
       {TIMEZONES.map((tz) => {
         const isActive = activeZone === tz.zone
         return (
@@ -27,21 +22,16 @@ function WorldClocksBar({ activeZone, onSelectZone, is24h = true }) {
                 onSelectZone?.(tz.zone)
               }
             }}
+            className={styles.card}
             style={{
               backgroundColor: isActive
                 ? 'rgba(255,255,255,0.35)'
                 : 'rgba(255,255,255,0.15)',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              textAlign: 'center',
-              minWidth: '100px',
               border: isActive ? '2px solid rgba(255,255,255,0.6)' : '2px solid transparent',
-              transition: 'background-color 0.2s, border-color 0.2s',
             }}
           >
-            <div style={{ fontWeight: 'bold', marginBottom: '4px' }}>{tz.label}</div>
-            <div style={{ fontFamily: 'monospace' }}>
+            <div className={styles.cardLabel}>{tz.label}</div>
+            <div className={styles.cardTime}>
               {is24h ? getTimeForTimezone(tz.zone) : convertTo12Hour(getTimeForTimezone(tz.zone))}
             </div>
           </div>

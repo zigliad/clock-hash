@@ -1,0 +1,44 @@
+.root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: monospace;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 1s, color 1s;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  gap: 12px;
+}
+
+.headerClocks {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.clock {
+  font-size: clamp(3rem, 10vw, 8rem);
+}

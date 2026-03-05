@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useCountdown } from '../hooks/useCountdown'
 import { isValidTimeInput } from '../utils/countdown'
+import styles from './CountdownTimer.module.css'
 
 const MODE_IDLE = 'idle'
 const MODE_INPUT = 'input'
@@ -33,24 +34,24 @@ export function CountdownTimer() {
 
   if (mode === MODE_INPUT) {
     return (
-      <div data-testid="countdown-timer" style={containerStyle}>
-        <form onSubmit={handleSubmit} style={formStyle}>
+      <div data-testid="countdown-timer" className={styles.container}>
+        <form onSubmit={handleSubmit} className={styles.form}>
           <input
             aria-label="Target time"
             type="time"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={(e) => e.key === 'Escape' && handleCancel()}
-            style={inputStyle}
+            className={styles.input}
           />
-          <button type="submit" style={setButtonStyle}>
+          <button type="submit" className={styles.setButton}>
             Set
           </button>
         </form>
         <button
           onClick={handleCancel}
           aria-label="Cancel"
-          style={clearButtonStyle}
+          className={styles.clearButton}
         >
           &times;
         </button>
@@ -62,14 +63,13 @@ export function CountdownTimer() {
     return (
       <div
         data-testid="countdown-timer"
-        className={reached ? 'pulse' : ''}
-        style={containerStyle}
+        className={`${reached ? 'pulse' : ''} ${styles.container}`}
       >
-        <span style={displayStyle}>{display}</span>
+        <span className={styles.display}>{display}</span>
         <button
           onClick={handleClear}
           aria-label="Clear target"
-          style={clearButtonStyle}
+          className={styles.clearButton}
         >
           &times;
         </button>
@@ -78,63 +78,14 @@ export function CountdownTimer() {
   }
 
   return (
-    <div data-testid="countdown-timer" style={containerStyle}>
+    <div data-testid="countdown-timer" className={styles.container}>
       <button
         onClick={() => setMode(MODE_INPUT)}
         aria-label="Set target"
-        style={setButtonStyle}
+        className={styles.setButton}
       >
         Set target
       </button>
     </div>
   )
-}
-
-const containerStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '8px',
-  padding: '8px',
-  fontSize: '1.2rem',
-}
-
-const displayStyle = {
-  fontFamily: 'monospace',
-}
-
-const formStyle = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-}
-
-const inputStyle = {
-  fontFamily: 'monospace',
-  fontSize: '1rem',
-  padding: '4px 8px',
-  background: 'rgba(255,255,255,0.2)',
-  border: '1px solid currentColor',
-  borderRadius: '4px',
-  color: 'inherit',
-}
-
-const setButtonStyle = {
-  fontFamily: 'monospace',
-  fontSize: '0.8rem',
-  padding: '4px 12px',
-  background: 'rgba(255,255,255,0.15)',
-  border: '1px solid currentColor',
-  borderRadius: '4px',
-  color: 'inherit',
-  cursor: 'pointer',
-}
-
-const clearButtonStyle = {
-  background: 'none',
-  border: 'none',
-  color: 'inherit',
-  fontSize: '1.4rem',
-  cursor: 'pointer',
-  padding: '0 4px',
 }

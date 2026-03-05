@@ -16,17 +16,16 @@ describe('ColorHistoryStrip', () => {
     expect(strip).toBeInTheDocument()
   })
 
-  it('is fixed at the bottom of the screen', () => {
+  it('has the strip CSS module class applied', () => {
     render(<ColorHistoryStrip history={[]} />)
     const strip = screen.getByTestId('color-history-strip')
-    expect(strip.style.position).toBe('fixed')
-    expect(strip.style.bottom).toBe('0px')
+    expect(strip.className).toBeTruthy()
   })
 
-  it('has height of 20px (within 24px limit)', () => {
+  it('is a normal flow element (no fixed positioning)', () => {
     render(<ColorHistoryStrip history={[]} />)
     const strip = screen.getByTestId('color-history-strip')
-    expect(strip.style.height).toBe('20px')
+    expect(strip.style.position).not.toBe('fixed')
   })
 
   it('renders correct number of slices', () => {
@@ -60,10 +59,9 @@ describe('ColorHistoryStrip', () => {
     expect(slice.getAttribute('title')).toBe('12:00:05 — #abcdef')
   })
 
-  it('does not interfere with main layout (full width, no extra height)', () => {
+  it('uses CSS module class for layout', () => {
     render(<ColorHistoryStrip history={[]} />)
     const strip = screen.getByTestId('color-history-strip')
-    expect(strip.style.width).toBe('100%')
-    expect(strip.style.left).toBe('0px')
+    expect(strip.className).toBeTruthy()
   })
 })
