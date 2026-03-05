@@ -10,6 +10,8 @@ import { ColorInfoOverlay } from './components/ColorInfoOverlay'
 import { convertTo12Hour } from './utils/timeFormat'
 import { useNextBeautifulColor } from './hooks/useNextBeautifulColor'
 import { NextBeautifulColorLabel } from './components/NextBeautifulColorLabel'
+import { useFullscreen } from './hooks/useFullscreen'
+import { FullscreenButton } from './components/FullscreenButton'
 
 function App() {
   const [activeZone, setActiveZone] = useState(null)
@@ -28,6 +30,8 @@ function App() {
   const lightness = getLightness(color)
   const colorHistory = useColorHistory(color)
   const nextBeautiful = useNextBeautifulColor(is24h)
+  const { isFullscreen, cursorHidden, toggleFullscreen } = useFullscreen()
+  const textColor = lightness > 0.5 ? '#000' : '#fff'
 
   function handleSelectZone(zone) {
     setActiveZone((prev) => (prev === zone ? null : zone))
@@ -36,16 +40,18 @@ function App() {
   return (
     <div style={{
       backgroundColor: color,
-      color: lightness > 0.5 ? '#000' : '#fff',
+      color: textColor,
       height: '100vh',
       display: 'flex',
       flexDirection: 'column',
       transition: 'background-color 1s, color 1s',
       fontFamily: 'monospace',
       position: 'relative',
+      cursor: cursorHidden ? 'none' : 'default',
     }}>
-      <TimeFormatToggle is24h={is24h} onToggle={toggle} />
-      <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} is24h={is24h} />
+      {!isFullscreen && <TimeFormatToggle is24h={is24h} onToggle={toggle} />}
+      {!isFullscreen && <WorldClocksBar activeZone={activeZone} onSelectZone={handleSelectZone} is24h={is24h} />}
+      {!cursorHidden && <FullscreenButton isFullscreen={isFullscreen} onToggle={toggleFullscreen} />}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -56,17 +62,17 @@ function App() {
         <div data-testid="main-clock" style={{ fontSize: 'clamp(3rem, 10vw, 8rem)' }}>
           {time}
         </div>
-        <CountdownTimer />
+        {!isFullscreen && <CountdownTimer />}
       </div>
-      <ColorHistoryStrip history={colorHistory} />
-      {nextBeautiful && (
+      {!isFullscreen && <ColorHistoryStrip history={colorHistory} />}
+      {!isFullscreen && nextBeautiful && (
         <NextBeautifulColorLabel
           label={nextBeautiful.label}
           display={nextBeautiful.display}
-          textColor={lightness > 0.5 ? '#000' : '#fff'}
+          textColor={textColor}
         />
       )}
-      <ColorInfoOverlay hex={color} textColor={lightness > 0.5 ? '#000' : '#fff'} />
+      {!isFullscreen && <ColorInfoOverlay hex={color} textColor={textColor} />}
     </div>
   )
 }
